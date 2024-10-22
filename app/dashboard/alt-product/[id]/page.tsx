@@ -19,16 +19,30 @@ import Cropper, { ReactCropperElement } from 'react-cropper'
 import 'cropperjs/dist/cropper.css'
 import { Textarea } from '@/components/ui/textarea'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { PutBlobResult } from '@vercel/blob'
 
 // interface IParams {
 //   id: string
 // }
+
+interface IProductDto {
+  name: string
+  description: string
+  category: string
+  retailPrice: number
+  wholesalePrice: number
+  minQuantity: number
+  imageUrl: string
+  status: boolean
+}
 
 export default function AltProduct() {
   const cropperRef = useRef<ReactCropperElement>(null)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [showPreview, setShowPreview] = useState<boolean>(false)
+  const [urlCroppedImage, setUrlCroppedImage] = useState<string | null>(null)
+  const [blob, setBlob] = useState<PutBlobResult | null>(null)
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -46,7 +60,9 @@ export default function AltProduct() {
 
   const onCrop = () => {
     const cropper = cropperRef.current?.cropper
-    console.log(cropper?.getCroppedCanvas().toDataURL())
+    const urlCropped = cropper?.getCroppedCanvas().toDataURL()
+    console.log(urlCropped)
+    if (urlCropped) setUrlCroppedImage(urlCropped)
   }
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -62,17 +78,84 @@ export default function AltProduct() {
     },
   })
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values)
-    console.log(selectedFile)
+  const base64ToFile = (base64String: string, fileName: string): File => {
+    const arr = base64String.split(',')
+    const mime = arr[0].match(/:(.*?);/)![1]
+    const bstr = atob(arr[1])
+    let n = bstr.length
+    const u8arr = new Uint8Array(n)
+
+    while (n--) {
+      u8arr[n] = bstr.charCodeAt(n)
+    }
+
+    return new File([u8arr], fileName, { type: mime })
   }
 
+  const uploadImageToBlob = async (filename: string, file: File) => {
+    const response = await fetch(`/api/blob/upload?filename=${filename}`, {
+      method: 'POST',
+      body: file,
+    })
+
+    const newBlob = (await response.json()) as PutBlobResult
+    setBlob(newBlob)
+  }
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    console.log(values)
+    console.log(selectedFile)
+
+    // Pegar a url
+    // converter e enviar o arquivo
+    if (!urlCroppedImage) throw new Error('Image crooped does not exist')
+
+    const newCroppedImage: File = base64ToFile(urlCroppedImage, 'cropped-image')
+
+    await uploadImageToBlob(values.name, newCroppedImage)
+
+    if (!blob?.url) throw new Error('Url Image does exist')
+    const imageUrl: string = blob!.url // A variável que contém o valor de imageUrl
+
+    // Criando o objeto newProductDto com os valores do formulário
+    const newProductDto: IProductDto = {
+      ...values, // Espalha os valores do formulário
+      retailPrice: values.retailPrice, // Converte retailPrice para Decimal
+      wholesalePrice: values.wholesalePrice, // Converte wholesalePrice para Decimal
+      imageUrl, // Adiciona o campo imageUrl
+    }
+
+    console.log('NEW PRODUCT DTO:', newProductDto)
+  }
+
+  // const deleteImageFromBlob = async (imageUrl: string) => {
+  //   try {
+  //     const response = await fetch(`/api/blob/upload?url=${imageUrl}`, {
+  //       method: 'DELETE',
+  //     })
+  //     if (response.status === 200) {
+  //       alert('A imagem foi removida.')
+  //     } else {
+  //       console.error('Erro ao deletar imagem:', response)
+  //     }
+  //   } catch (error) {
+  //     console.error('Erro ao deletar imagem:', error)
+  //   }
+  // }
+
   return (
-    <div className="flex h-screen items-center justify-center">
+    <div className="flex items-center justify-center">
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <div className="grid w-full max-w-sm items-center justify-center gap-4">
-            <Label htmlFor="picture">Imagem</Label>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="w-[400px] space-y-4 p-5"
+        >
+          <div className="flex flex-col items-center justify-center gap-4">
+            <div>
+              <Label htmlFor="picture" className="text-start">
+                Imagem
+              </Label>
+            </div>
             <Input
               id="picture"
               type="file"
@@ -80,6 +163,7 @@ export default function AltProduct() {
               required
               onChange={handleFileChange}
             />
+
             {previewUrl && showPreview && (
               <div className="mt-4 space-y-4">
                 <div className="relative aspect-square w-full overflow-hidden rounded-lg">

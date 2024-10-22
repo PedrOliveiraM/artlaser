@@ -20,7 +20,7 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { Plus, Undo2 } from 'lucide-react'
-import ProductSchema from '../_schema/'
+import ProductSchema from '../_schema/formSchema'
 
 // Tipagem dos inputs do formulário
 export type ProductFormInputs = z.infer<typeof ProductSchema>
