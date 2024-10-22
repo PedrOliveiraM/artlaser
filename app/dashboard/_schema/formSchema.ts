@@ -1,24 +1,56 @@
 import { z } from 'zod'
 
 const formSchema = z.object({
-  name: z.string().min(2).max(50).trim(),
-  description: z.string().min(10).trim(),
-  category: z.string().min(2).trim(),
+  name: z
+    .string()
+    .min(2, {
+      message: 'Deve ter pelo menos 2 caracteres',
+    })
+    .max(50, {
+      message: 'O Mínimo são 50 caracteres',
+    })
+    .trim(),
+  description: z
+    .string()
+    .min(10, {
+      message: 'Deve ter pelo menos 10 caracteres',
+    })
+    .trim(),
+  category: z
+    .string()
+    .min(2, {
+      message: 'Deve ter pelo menos 2 caracteres',
+    })
+    .trim(),
   retailPrice: z.preprocess(
     (value) => Number(value),
-    z.number().positive({ message: 'Retail price must be positive' }),
+    z.number().positive({ message: 'Informe uma quantidade válida' }),
   ),
   wholesalePrice: z.preprocess(
     (value) => Number(value),
-    z.number().positive({ message: 'Wholesale price must be positive' }),
+    z
+      .number()
+      .positive({ message: 'O Preço deve ser maior que R$ 0.00' })
+      .min(0, {
+        message: 'Esse campo precisa de um preço válido',
+      })
+      .max(1000000, {
+        message: 'O valor máximo suportado é R$ 1.000.000',
+      }),
   ),
   minQuantity: z.preprocess(
     (value) => Number(value),
-    z.number().int().positive({ message: 'Minimum quantity must be positive' }),
+    z
+      .number()
+      .positive({ message: 'O Preço deve ser maior que R$ 0.00' })
+      .min(0, {
+        message: 'Esse campo precisa de um preço válido',
+      })
+      .max(1000000, {
+        message: 'O valor máximo suportado é R$ 1.000.000',
+      }),
   ),
-  status: z.enum(['ativo', 'inativo']).transform((val) => {
-    return val === 'ativo'
-  }),
+  status: z.enum(['ativo', 'inativo']),
 })
 
 export default formSchema
