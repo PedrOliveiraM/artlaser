@@ -1,10 +1,10 @@
 'use client'
+
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PutBlobResult } from '@vercel/blob'
-
 import 'cropperjs/dist/cropper.css'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -20,91 +20,80 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { Plus, Undo2 } from 'lucide-react'
+import ProductSchema from '../_schema/'
 
-interface CropperImageElement extends HTMLImageElement {
-  cropper: Cropper // Assuming Cropper is the type from the cropperjs library
-}
-const productSchema = z.object({
-  name: z.string().min(1, { message: 'Name is required' }),
-  description: z.string().min(1, { message: 'Description is required' }),
-  category: z.string().min(1, { message: 'Category is required' }),
-  retailPrice: z.preprocess(
-    (value) => Number(value),
-    z.number().positive({ message: 'Retail price must be positive' }),
-  ),
-  wholesalePrice: z.preprocess(
-    (value) => Number(value),
-    z.number().positive({ message: 'Wholesale price must be positive' }),
-  ),
-  minQuantity: z.preprocess(
-    (value) => Number(value),
-    z.number().int().positive({ message: 'Minimum quantity must be positive' }),
-  ),
-  imageTitle: z.string().min(1, { message: 'Image title is required' }),
-  imagePath: z.string(), // This will be set after file upload
-  status: z
-    .enum(['ativo', 'pausado'])
-    .transform((status) => status === 'ativo'), // Transforma 'ativo' em true e 'pausado' em false
-  // Status as enum
-})
-export type ProductFormInputs = z.infer<typeof productSchema>
+// Tipagem dos inputs do formulário
+export type ProductFormInputs = z.infer<typeof ProductSchema>
 
 export default function ProductForm() {
   const [blob, setBlob] = useState<PutBlobResult | null>(null)
-
-  const [image, setImage] = useState<string | null>(null) // imagem enviada pelo usuario
-  const [imageName, setImageName] = useState<string>('') // imagem enviada pelo usuario
-  const [croppedImage, setCroppedImage] = useState<string | null>(null) // imagem cortada
-  const cropperRef = useRef<CropperImageElement | null>(null)
-
-  const [showPreview, setshowPreview] = useState(false)
-  const [showImage, setshowImage] = useState(false)
+  const [imageSrc, setImageSrc] = useState<string | null>(null) // Imagem enviada pelo usuário
+  const [croppedImageSrc, setCroppedImageSrc] = useState<string | null>(null) // Imagem cortada
+  const cropperRef = useRef<HTMLImageElement | null>(null)
+  const [showPreview, setShowPreview] = useState(false)
+  const [showCropper, setShowCropper] = useState(false)
 
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<ProductFormInputs>({
-    resolver: zodResolver(productSchema),
+    resolver: zodResolver(ProductSchema),
   })
+
+  // Função para excluir o blob da imagem no servidor
   const deleteImageBlob = async (blobUrl: string) => {
-    const response = await fetch(`/api/avatar/upload?url=${blobUrl}`, {
-      method: 'DELETE',
-    })
-    if (response.status === 200) {
-      alert('the image has been removed')
+    try {
+      const response = await fetch(`/api/blob/upload?url=${blobUrl}`, {
+        method: 'DELETE',
+      })
+      if (response.status === 200) {
+        alert('A imagem foi removida.')
+      } else {
+        console.error('Erro ao deletar imagem:', response)
+      }
+    } catch (error) {
+      console.error('Erro ao deletar imagem:', error)
     }
   }
 
-  const uploadImageBlob = async () => {
-    if (!croppedImage) throw new Error('Cropped Image does not exist')
+  // Função para realizar upload da imagem cortada
+  const uploadCroppedImageBlob = async () => {
+    if (!croppedImageSrc) throw new Error('Imagem cortada não existe.')
 
-    const fileCropped = await convertUrlToFile(croppedImage, imageName)
-
-    console.log('Novo arquivo:', fileCropped, blob)
+    const croppedFile = await convertUrlToFile(croppedImageSrc)
 
     const response = await fetch(
-      `/api/avatar/upload?filename=${fileCropped.name}`,
+      `/api/blob/upload?filename=${croppedFile.name}`,
       {
         method: 'POST',
-        body: fileCropped,
+        body: croppedFile,
       },
     )
 
-    const newBlob = (await response.json()) as PutBlobResult
+    if (!response.ok) {
+      throw new Error('Falha ao fazer upload da imagem.')
+    }
 
-    setBlob(newBlob)
+    const uploadedBlob = (await response.json()) as PutBlobResult
+    setBlob(uploadedBlob)
+    return uploadedBlob
   }
 
+  // Função que converte URL em um arquivo
+  const convertUrlToFile = async (url: string): Promise<File> => {
+    const response = await fetch(url)
+    const blob = await response.blob()
+    return new File([blob], 'cropped_image.jpg', { type: blob.type })
+  }
+
+  // Submissão do formulário
   const onSubmit = async (data: ProductFormInputs) => {
     try {
-      // criar blob
-      uploadImageBlob()
-      data.imagePath = blob!.url
+      const uploadedBlob = await uploadCroppedImageBlob()
+      data.imagePath = uploadedBlob.url
 
-      console.log('DATA ENVIADA : ', data)
-
-      const responseProduct = await fetch(`/api/products/`, {
+      const response = await fetch(`/api/products/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -112,56 +101,38 @@ export default function ProductForm() {
         body: JSON.stringify(data),
       })
 
-      if (!responseProduct.ok) {
-        deleteImageBlob(data.imagePath)
-        throw new Error('Failed to add product')
+      if (!response.ok) {
+        throw new Error('Falha ao criar produto.')
       }
-      // Assuming the API response is also JSON
-      const res = await responseProduct.json()
 
-      if (res.status !== 200) {
-        deleteImageBlob(data.imagePath)
-        throw new Error('Não foi possivel criar esse produto')
-      }
-      // toast({
-      //   title: 'Success',
-      //   description: 'Produto adicionado com sucesso!',
-      // })
+      alert('Produto criado com sucesso!')
     } catch (error) {
-      deleteImageBlob(data.imagePath)
-      // toast({ title: 'Erro', description: (error as Error).message })
       console.error(error)
+      if (blob) {
+        deleteImageBlob(blob.url)
+      }
+      alert('Erro ao criar produto. Verifique o console para mais detalhes.')
     }
   }
-  // recebe a imagem do usuario e salva em um state
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0] // pegando a imagem
-    if (!file) throw new Error('Image required') // verificando se existe
-    setImageName(file.name) // guardando o nome da imagem
 
-    console.log('Nome da imagem enviada:', imageName)
-    const imageUrl = URL.createObjectURL(file) // tranformando a imagem em uma URL TEMPORARIA
-    setImage(imageUrl)
-    setshowImage(true)
+  // Função que lida com o envio de imagem e exibe o cropper
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const imageUrl = URL.createObjectURL(file)
+    setImageSrc(imageUrl)
+    setShowCropper(true)
   }
 
+  // Função que corta a imagem
   const cropImage = () => {
     if (cropperRef.current && cropperRef.current.cropper) {
       const croppedCanvas = cropperRef.current.cropper.getCroppedCanvas()
       const croppedUrl = croppedCanvas.toDataURL('image/jpeg')
-      setCroppedImage(croppedUrl)
-      setshowPreview(true)
-      setshowImage(false)
+      setCroppedImageSrc(croppedUrl)
+      setShowPreview(true)
+      setShowCropper(false)
     }
-  }
-
-  const convertUrlToFile = async (
-    url: string,
-    fileName: string,
-  ): Promise<File> => {
-    const response = await fetch(url)
-    const blob = await response.blob()
-    return new File([blob], fileName, { type: blob.type })
   }
 
   return (
@@ -173,20 +144,20 @@ export default function ProductForm() {
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-1">
-          <label htmlFor="imageTitle">Título da Imagem</label>
+          <label htmlFor="imageTitle">Imagem</label>
           <Input type="file" accept="image/*" onChange={handleImageChange} />
-          {image && showImage && (
+          {imageSrc && showCropper && (
             <div className="mt-5 flex max-w-sm flex-col justify-center">
               <Cropper
-                src={image}
+                src={imageSrc}
                 className="max-h-96"
-                aspectRatio={1} // Adjust to crop in a square ratio (or any ratio you want)
+                aspectRatio={1}
                 guides={false}
                 ref={cropperRef}
                 viewMode={1}
                 dragMode="move"
-                cropBoxMovable={true}
-                cropBoxResizable={true}
+                cropBoxMovable
+                cropBoxResizable
                 autoCropArea={1}
                 background={false}
               />
@@ -201,30 +172,30 @@ export default function ProductForm() {
             </div>
           )}
 
-          {croppedImage && showPreview && (
+          {croppedImageSrc && showPreview && (
             <div className="relative">
               <div className="flex flex-col justify-center gap-2">
                 <h2 className="text-center font-semibold">Imagem cortada</h2>
                 <Image
-                  src={croppedImage}
+                  src={croppedImageSrc}
                   alt="Cropped"
                   className="mx-auto object-cover"
                   width={215}
                   height={215}
                 />
-                <Button type="button" onClick={() => setshowPreview(false)}>
+                <Button type="button" onClick={() => setShowPreview(false)}>
                   Fechar
                 </Button>
               </div>
             </div>
           )}
+
           <div>
             <label htmlFor="imageTitle">Título da Imagem</label>
             <Input
-              required
               id="imageTitle"
               {...register('imageTitle')}
-              placeholder="Image Title"
+              placeholder="Título da Imagem"
             />
             {errors.imageTitle && (
               <span className="text-red-500">{errors.imageTitle.message}</span>
@@ -234,10 +205,9 @@ export default function ProductForm() {
           <div>
             <label htmlFor="name">Nome do produto</label>
             <Input
-              required
               id="name"
               {...register('name')}
-              placeholder="Product Name"
+              placeholder="Nome do Produto"
             />
             {errors.name && (
               <span className="text-red-500">{errors.name.message}</span>
@@ -247,10 +217,9 @@ export default function ProductForm() {
           <div>
             <label htmlFor="description">Descrição do produto</label>
             <Textarea
-              required
               id="description"
               {...register('description')}
-              placeholder="Product Description"
+              placeholder="Descrição do Produto"
               maxLength={100}
             />
             {errors.description && (
@@ -261,10 +230,9 @@ export default function ProductForm() {
           <div>
             <label htmlFor="category">Categoria</label>
             <Input
-              required
               id="category"
               {...register('category')}
-              placeholder="Category"
+              placeholder="Categoria"
             />
             {errors.category && (
               <span className="text-red-500">{errors.category.message}</span>
@@ -274,11 +242,10 @@ export default function ProductForm() {
           <div>
             <label htmlFor="retailPrice">Preço de Varejo</label>
             <Input
-              required
               id="retailPrice"
               type="number"
               {...register('retailPrice')}
-              placeholder="Retail Price"
+              placeholder="Preço de Varejo"
             />
             {errors.retailPrice && (
               <span className="text-red-500">{errors.retailPrice.message}</span>
@@ -288,11 +255,10 @@ export default function ProductForm() {
           <div>
             <label htmlFor="wholesalePrice">Preço de Atacado</label>
             <Input
-              required
               id="wholesalePrice"
               type="number"
               {...register('wholesalePrice')}
-              placeholder="Wholesale Price"
+              placeholder="Preço de Atacado"
             />
             {errors.wholesalePrice && (
               <span className="text-red-500">
@@ -304,16 +270,16 @@ export default function ProductForm() {
           <div>
             <label htmlFor="minQuantity">Quantidade Mínima</label>
             <Input
-              required
               id="minQuantity"
               type="number"
               {...register('minQuantity')}
-              placeholder="Minimum Quantity"
+              placeholder="Quantidade Mínima"
             />
             {errors.minQuantity && (
               <span className="text-red-500">{errors.minQuantity.message}</span>
             )}
           </div>
+
           <div>
             <label>Status</label>
             <div className="flex gap-4">
@@ -321,39 +287,36 @@ export default function ProductForm() {
                 <input
                   type="radio"
                   id="ativo"
-                  value="ativo"
-                  {...register('status', { required: true })}
+                  value="active"
+                  {...register('status')}
                 />
                 Ativo
               </label>
-
-              <label htmlFor="pausado">
+              <label htmlFor="inativo">
                 <input
                   type="radio"
-                  id="pausado"
-                  value="pausado"
-                  {...register('status', { required: true })}
+                  id="inativo"
+                  value="inactive"
+                  {...register('status')}
                 />
-                Pausado
+                Inativo
               </label>
             </div>
             {errors.status && (
-              <span className="text-red-500">Status é obrigatório</span>
+              <span className="text-red-500">{errors.status.message}</span>
             )}
           </div>
         </form>
       </CardContent>
-      <CardFooter className="flex justify-between">
-        <Link href={'/pages/dashboard'}>
-          <Button type="button" variant={'alert'}>
-            <Undo2 />
-            Voltar
+      <CardFooter className="mt-5 flex flex-col items-center justify-center gap-2">
+        <Button className="w-full" type="submit">
+          <Plus className="mr-2 h-4 w-4" /> Salvar Produto
+        </Button>
+        <Link href="/dashboard">
+          <Button variant={'outline'} className="w-full">
+            <Undo2 className="mr-2 h-4 w-4" /> Voltar
           </Button>
         </Link>
-        <Button type="button" onClick={handleSubmit(onSubmit)}>
-          Adicionar Produto
-          <Plus />
-        </Button>
       </CardFooter>
     </Card>
   )
