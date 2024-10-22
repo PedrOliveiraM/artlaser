@@ -21,6 +21,7 @@ import Cropper, { ReactCropperElement } from 'react-cropper'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import formSchema from '../_schema/formSchema'
+import capitalizeWords from '@/functions/capitalizeWords'
 
 interface IProductDto {
   name: string
@@ -56,7 +57,7 @@ export default function AddProduct() {
   })
 
   const handleClosePreview = () => {
-    setImageUrl(null) // Fechar a pré-visualização
+    setImageUrl(null)
   }
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -109,7 +110,7 @@ export default function AddProduct() {
         }, 'image/png')
       })
     } catch (error) {
-      console.error('Error uploading image:', error)
+      console.error(`Error uploading image: ${blobResult}`, error)
       toast({
         title: 'Erro',
         description: 'Não foi possível salvar a imagem! Tente Novamente.',
@@ -170,17 +171,21 @@ export default function AddProduct() {
       setUploading(true)
       const newBlobResult = await uploadImageToBlob(values.name)
 
-      // Verifica se o blobResult foi atualizado
       if (!newBlobResult) throw new Error('Não foi possível enviar a imagem')
-      console.log('FUNC UPLOAD , NEW BLOB RESULT <> =', newBlobResult)
       setBlobResult(newBlobResult)
-      console.log('FUNC UPLOAD , BLOB RESULT = ', blobResult)
 
       const imageUrl = newBlobResult.url
       const booleanStatus = values.status === 'ativo'
 
+      const formatName = capitalizeWords(values.name)
+      const formatDescription = capitalizeWords(values.description)
+      const formatCategory = capitalizeWords(values.category)
+
       const newProductDto: IProductDto = {
         ...values,
+        name: formatName,
+        category: formatCategory,
+        description: formatDescription,
         retailPrice: values.retailPrice,
         wholesalePrice: values.wholesalePrice,
         status: booleanStatus,
