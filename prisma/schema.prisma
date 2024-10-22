@@ -30,7 +30,6 @@ model Product {
   retailPrice    Decimal  @db.Decimal(10, 2)
   wholesalePrice Decimal  @db.Decimal(10, 2)
   minQuantity    Int
-  imageTitle     String
   imageUrl       String
   status         Boolean
   CreatedAt      DateTime @default(now())
