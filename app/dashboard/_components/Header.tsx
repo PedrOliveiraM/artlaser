@@ -9,7 +9,7 @@ export function Header({ onFilterChange }: HeaderProps) {
   return (
     <header className="flex flex-col items-center justify-center gap-2 p-2 md:flex-row md:justify-between">
       <h1 className="pt-3 text-4xl font-bold">Artlaser Dashboard</h1>
-      <form className="relative flex flex-1 md:ml-auto md:grow-0">
+      <form className="relative flex flex-1 gap-2 md:ml-auto md:grow-0">
         <Search className="absolute left-2.5 top-[.75rem] h-4 w-4 text-muted-foreground" />
         <Input
           name="search"

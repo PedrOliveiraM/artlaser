@@ -1,4 +1,3 @@
-import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,10 +10,7 @@ export default function User() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button aria-haspopup="true" size="icon" variant="ghost">
-          <CircleUserRound className="h-8 w-8" />
-          <span className="sr-only">Toggle menu</span>
-        </Button>
+        <CircleUserRound size={40} className="hover:scale-105" />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem>
