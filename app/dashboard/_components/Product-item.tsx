@@ -13,6 +13,7 @@ import { MoreHorizontal, Pencil, ToggleRight, Trash2 } from 'lucide-react'
 import Image from 'next/image'
 import { useState } from 'react'
 import { updateProductStatus } from '../_actions/actions'
+import Link from 'next/link'
 
 export function ProductItem({ product }: { product: Product }) {
   const [stateProduct, setStateProduct] = useState(product)
@@ -29,7 +30,7 @@ export function ProductItem({ product }: { product: Product }) {
     <TableRow>
       <TableCell className="hidden sm:table-cell">
         <Image
-          alt={stateProduct.imageTitle}
+          alt={stateProduct.name}
           className="aspect-square rounded-md object-cover"
           height="64"
           src={stateProduct.imageUrl}
@@ -82,8 +83,13 @@ export function ProductItem({ product }: { product: Product }) {
               </button>
             </DropdownMenuItem>
             <DropdownMenuItem className="flex items-center gap-2">
-              <Pencil size={20} />
-              Editar
+              <Link
+                href={`/dashboard/alt-product/${stateProduct.id}`}
+                className="flex items-center gap-2"
+              >
+                <Pencil size={20} />
+                Editar
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuItem>
               <form>
