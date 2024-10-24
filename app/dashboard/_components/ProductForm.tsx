@@ -1,323 +1,420 @@
 'use client'
-
+import CircularIndeterminate from '@/components/loading'
 import { Button } from '@/components/ui/button'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Textarea } from '@/components/ui/textarea'
+import { useToast } from '@/hooks/use-toast'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PutBlobResult } from '@vercel/blob'
 import 'cropperjs/dist/cropper.css'
-import Image from 'next/image'
-import Link from 'next/link'
-import React, { useRef, useState } from 'react'
-import Cropper from 'react-cropper'
+import { ChangeEvent, useRef, useState } from 'react'
+import Cropper, { ReactCropperElement } from 'react-cropper'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
-import { Plus, Undo2 } from 'lucide-react'
-import ProductSchema from '../_schema/formSchema'
+import formSchema from '../_schema/formSchema'
+import capitalizeWords from '@/functions/capitalizeWords'
+import Link from 'next/link'
+import { Check, Undo2 } from 'lucide-react'
+import { Decimal } from '@prisma/client/runtime/library'
+import { updatedProduct } from '../_actions/actions'
 
-// Tipagem dos inputs do formulário
-export type ProductFormInputs = z.infer<typeof ProductSchema>
+interface IProductDto {
+  id: number
+  name: string
+  description: string
+  category: string
+  retailPrice: number
+  wholesalePrice: number
+  minQuantity: number
+  imageUrl: string
+  status: boolean
+}
 
-export default function ProductForm() {
-  const [blob, setBlob] = useState<PutBlobResult | null>(null)
-  const [imageSrc, setImageSrc] = useState<string | null>(null) // Imagem enviada pelo usuário
-  const [croppedImageSrc, setCroppedImageSrc] = useState<string | null>(null) // Imagem cortada
-  const cropperRef = useRef<HTMLImageElement | null>(null)
-  const [showPreview, setShowPreview] = useState(false)
-  const [showCropper, setShowCropper] = useState(false)
+interface IParamsProduct {
+  data: {
+    imageUrl: string
+    id: number
+    name: string
+    description: string
+    category: string
+    retailPrice: Decimal
+    status: boolean
+    wholesalePrice: Decimal
+    minQuantity: number
+    CreatedAt: Date
+  }
+}
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<ProductFormInputs>({
-    resolver: zodResolver(ProductSchema),
+export default function ProductForm({ data }: IParamsProduct) {
+  console.log(data)
+  const inputFileRef = useRef<HTMLInputElement>(null)
+  const cropperRef = useRef<ReactCropperElement>(null)
+  const [blobResult, setBlobResult] = useState<PutBlobResult | null>(null)
+  const [imageUrl, setImageUrl] = useState<string | null>(null)
+
+  const [uploading, setUploading] = useState<boolean>(false)
+  const { toast } = useToast()
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: data.name || '',
+      description: data.description || '',
+      category: data.category || '',
+      retailPrice: parseFloat(data.retailPrice.toString()) || 0.0,
+      wholesalePrice: parseFloat(data.wholesalePrice.toString()) || 0.0,
+      minQuantity: data.minQuantity || 0,
+      status: data.status ? 'ativo' : 'inativo',
+    },
   })
 
-  // Função para excluir o blob da imagem no servidor
-  const deleteImageBlob = async (blobUrl: string) => {
+  const handleClosePreview = () => {
+    setImageUrl(null)
+  }
+
+  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (file) {
+      const newImageUrl = URL.createObjectURL(file)
+      setImageUrl(newImageUrl) // Armazena o URL da nova imagem
+      cropperRef.current?.cropper.replace(newImageUrl) // Substitui a imagem no cropper
+    } else {
+      setImageUrl(null) // Se não há arquivo, usa a URL antiga
+    }
+  }
+
+  const uploadImageToBlob = async (
+    filename: string,
+  ): Promise<PutBlobResult | null> => {
     try {
-      const response = await fetch(`/api/blob/upload?url=${blobUrl}`, {
-        method: 'DELETE',
-      })
-      if (response.status === 200) {
-        alert('A imagem foi removida.')
-      } else {
-        console.error('Erro ao deletar imagem:', response)
+      const cropper = cropperRef.current?.cropper
+      if (!cropper) {
+        throw new Error('Cropper not found')
       }
+
+      // Convert the cropped image to Blob
+      return new Promise((resolve, reject) => {
+        cropper.getCroppedCanvas().toBlob(async (blob) => {
+          if (!blob) {
+            reject(new Error('Failed to create Blob from cropped image'))
+            return
+          }
+
+          const file = new File([blob], `${filename}-${Date.now()}.png`, {
+            type: 'image/png',
+          })
+
+          // Upload the cropped image to Vercel Blob
+          const response = await fetch(
+            `/api/blob/upload?filename=${file.name}`,
+            {
+              method: 'POST',
+              body: file,
+            },
+          )
+
+          if (!response.ok) {
+            reject(new Error('Failed to upload image'))
+            return
+          }
+
+          const newBlob = (await response.json()) as PutBlobResult
+          setBlobResult(newBlob)
+          resolve(newBlob) // Retorna o novo blob para o chamador
+        }, 'image/png')
+      })
     } catch (error) {
-      console.error('Erro ao deletar imagem:', error)
+      console.error(`Error uploading image: ${blobResult}`, error)
+      toast({
+        title: 'Erro',
+        description: 'Não foi possível salvar a imagem! Tente Novamente.',
+        variant: 'destructive',
+      })
+      return null
     }
   }
 
-  // Função para realizar upload da imagem cortada
-  const uploadCroppedImageBlob = async () => {
-    if (!croppedImageSrc) throw new Error('Imagem cortada não existe.')
-
-    const croppedFile = await convertUrlToFile(croppedImageSrc)
-
-    const response = await fetch(
-      `/api/blob/upload?filename=${croppedFile.name}`,
-      {
-        method: 'POST',
-        body: croppedFile,
-      },
-    )
-
-    if (!response.ok) {
-      throw new Error('Falha ao fazer upload da imagem.')
-    }
-
-    const uploadedBlob = (await response.json()) as PutBlobResult
-    setBlob(uploadedBlob)
-    return uploadedBlob
-  }
-
-  // Função que converte URL em um arquivo
-  const convertUrlToFile = async (url: string): Promise<File> => {
-    const response = await fetch(url)
-    const blob = await response.blob()
-    return new File([blob], 'cropped_image.jpg', { type: blob.type })
-  }
-
-  // Submissão do formulário
-  const onSubmit = async (data: ProductFormInputs) => {
+  const deleteImageFromBlob = async (
+    url: string | undefined,
+  ): Promise<boolean> => {
     try {
-      const uploadedBlob = await uploadCroppedImageBlob()
-      data.imagePath = uploadedBlob.url
-
-      const response = await fetch(`/api/products/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
+      const response = await fetch(`/api/blob/upload?url=${url}`, {
+        method: 'DELETE',
       })
 
       if (!response.ok) {
-        throw new Error('Falha ao criar produto.')
+        throw new Error(`Failed to delete image: ${response.statusText}`)
       }
 
-      alert('Produto criado com sucesso!')
+      return true // Indicate success
     } catch (error) {
-      console.error(error)
-      if (blob) {
-        deleteImageBlob(blob.url)
-      }
-      alert('Erro ao criar produto. Verifique o console para mais detalhes.')
+      console.error('Error deleting image:', error)
+      return false
     }
   }
 
-  // Função que lida com o envio de imagem e exibe o cropper
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-    const imageUrl = URL.createObjectURL(file)
-    setImageSrc(imageUrl)
-    setShowCropper(true)
-  }
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    try {
+      setUploading(true)
 
-  // Função que corta a imagem
-  const cropImage = () => {
-    if (cropperRef.current && cropperRef.current.cropper) {
-      const croppedCanvas = cropperRef.current.cropper.getCroppedCanvas()
-      const croppedUrl = croppedCanvas.toDataURL('image/jpeg')
-      setCroppedImageSrc(croppedUrl)
-      setShowPreview(true)
-      setShowCropper(false)
+      let finalImageUrl = data.imageUrl // Preserva a URL da imagem antiga
+
+      // Verifica se uma nova imagem foi carregada
+      if (imageUrl) {
+        const newBlobResult = await uploadImageToBlob(values.name)
+        if (!newBlobResult) throw new Error('Não foi possível enviar a imagem')
+        finalImageUrl = newBlobResult.url
+
+        // Se a imagem foi alterada, exclua a antiga
+        if (data.imageUrl) {
+          await deleteImageFromBlob(data.imageUrl)
+        }
+      }
+
+      const booleanStatus = values.status === 'ativo'
+      const formatName = capitalizeWords(values.name)
+      const formatDescription = capitalizeWords(values.description)
+      const formatCategory = capitalizeWords(values.category)
+
+      const newProductDto: IProductDto = {
+        ...values,
+        id: data.id,
+        name: formatName,
+        category: formatCategory,
+        description: formatDescription,
+        retailPrice: values.retailPrice,
+        wholesalePrice: values.wholesalePrice,
+        status: booleanStatus,
+        imageUrl: finalImageUrl, // Usa a imagem final (nova ou antiga)
+      }
+
+      const product = await updatedProduct(newProductDto)
+      console.log('Returned product:', product)
+
+      setUploading(false)
+      toast({
+        title: 'Salvo com sucesso',
+        description: 'Produto alterado com sucesso!',
+        variant: 'success',
+      })
+    } catch (error) {
+      setUploading(false)
+      console.error('Error submitting form:', error)
+      toast({
+        title: 'Erro',
+        description: 'Não foi possível salvar o produto! Tente Novamente.',
+        variant: 'destructive',
+      })
     }
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-center text-2xl font-bold">
-          Cadastrar Produto
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-1">
-          <label htmlFor="imageTitle">Imagem</label>
-          <Input type="file" accept="image/*" onChange={handleImageChange} />
-          {imageSrc && showCropper && (
-            <div className="mt-5 flex max-w-sm flex-col justify-center">
-              <Cropper
-                src={imageSrc}
-                className="max-h-96"
-                aspectRatio={1}
-                guides={false}
-                ref={cropperRef}
-                viewMode={1}
-                dragMode="move"
-                cropBoxMovable
-                cropBoxResizable
-                autoCropArea={1}
-                background={false}
+    <>
+      {uploading && <CircularIndeterminate />}
+      <div className="flex min-h-screen flex-col items-center justify-center bg-gray-100 p-4">
+        <div className="w-full max-w-lg rounded-lg bg-white p-6 shadow-md">
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-4 p-5"
+            >
+              <h1 className="text-center text-2xl font-bold">
+                Alterar Produto
+              </h1>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="mb-4 block w-full text-sm text-gray-500 file:mr-4 file:rounded-full file:border-0 file:bg-indigo-100 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-indigo-700 hover:file:bg-indigo-200"
+                ref={inputFileRef}
               />
-              <Button
-                variant={'secondary'}
-                type="button"
-                onClick={cropImage}
-                className="mt-10"
-              >
-                Cortar Imagem
-              </Button>
-            </div>
-          )}
 
-          {croppedImageSrc && showPreview && (
-            <div className="relative">
-              <div className="flex flex-col justify-center gap-2">
-                <h2 className="text-center font-semibold">Imagem cortada</h2>
-                <Image
-                  src={croppedImageSrc}
-                  alt="Cropped"
-                  className="mx-auto object-cover"
-                  width={215}
-                  height={215}
-                />
-                <Button type="button" onClick={() => setShowPreview(false)}>
-                  Fechar
+              {imageUrl && ( // Verifica se imageUrl não é nulo
+                <>
+                  <Cropper
+                    className="mb-4 max-h-96"
+                    aspectRatio={1}
+                    guides={false}
+                    ref={cropperRef}
+                    viewMode={1}
+                    dragMode="move"
+                    cropBoxMovable
+                    cropBoxResizable
+                    autoCropArea={1}
+                    background={false}
+                    src={imageUrl} // Define a imagem a ser cortada
+                  />
+                  <div className="flex justify-between">
+                    <Button type="button" onClick={handleClosePreview}>
+                      Fechar Pré-visualização
+                    </Button>
+                  </div>
+                </>
+              )}
+
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Produto</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Informe o nome do produto"
+                        {...field}
+                        defaultValue={'pedro de teixeira'}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Descrição</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Informe a descrição do produto"
+                        {...field}
+                        maxLength={125}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="category"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Categoria</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Informe a categoria do produto"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="retailPrice"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Preço de Varejo</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        placeholder="Preço do produto a varejo"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="wholesalePrice"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Preço de Atacado</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        placeholder="Preço do produto em atacado"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="minQuantity"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Quantidade Para Atacado</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        placeholder="Quantidade Mínima para atacado"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="status"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Status</FormLabel>
+                    <FormControl>
+                      <RadioGroup
+                        defaultValue={field.value ? 'ativo' : 'inativo'}
+                        onValueChange={field.onChange}
+                      >
+                        <FormItem className="flex items-center space-x-3 space-y-0">
+                          <FormControl>
+                            <RadioGroupItem value="ativo" />
+                          </FormControl>
+                          <FormLabel className="font-normal">Ativo</FormLabel>
+                        </FormItem>
+                        <FormItem className="flex items-center space-x-3 space-y-0">
+                          <FormControl>
+                            <RadioGroupItem value="inativo" />
+                          </FormControl>
+                          <FormLabel className="font-normal">Inativo</FormLabel>
+                        </FormItem>
+                      </RadioGroup>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div className="flex justify-between">
+                <Button
+                  type="button"
+                  variant={'alert'}
+                  className="flex items-center"
+                >
+                  <Undo2 size={20} />
+                  <Link href={'/dashboard'}>Voltar</Link>
+                </Button>
+                <Button type="submit" className="flex items-center">
+                  Salvar Produto
+                  <Check size={20} />
                 </Button>
               </div>
-            </div>
-          )}
-
-          <div>
-            <label htmlFor="imageTitle">Título da Imagem</label>
-            <Input
-              id="imageTitle"
-              {...register('imageTitle')}
-              placeholder="Título da Imagem"
-            />
-            {errors.imageTitle && (
-              <span className="text-red-500">{errors.imageTitle.message}</span>
-            )}
-          </div>
-
-          <div>
-            <label htmlFor="name">Nome do produto</label>
-            <Input
-              id="name"
-              {...register('name')}
-              placeholder="Nome do Produto"
-            />
-            {errors.name && (
-              <span className="text-red-500">{errors.name.message}</span>
-            )}
-          </div>
-
-          <div>
-            <label htmlFor="description">Descrição do produto</label>
-            <Textarea
-              id="description"
-              {...register('description')}
-              placeholder="Descrição do Produto"
-              maxLength={100}
-            />
-            {errors.description && (
-              <span className="text-red-500">{errors.description.message}</span>
-            )}
-          </div>
-
-          <div>
-            <label htmlFor="category">Categoria</label>
-            <Input
-              id="category"
-              {...register('category')}
-              placeholder="Categoria"
-            />
-            {errors.category && (
-              <span className="text-red-500">{errors.category.message}</span>
-            )}
-          </div>
-
-          <div>
-            <label htmlFor="retailPrice">Preço de Varejo</label>
-            <Input
-              id="retailPrice"
-              type="number"
-              {...register('retailPrice')}
-              placeholder="Preço de Varejo"
-            />
-            {errors.retailPrice && (
-              <span className="text-red-500">{errors.retailPrice.message}</span>
-            )}
-          </div>
-
-          <div>
-            <label htmlFor="wholesalePrice">Preço de Atacado</label>
-            <Input
-              id="wholesalePrice"
-              type="number"
-              {...register('wholesalePrice')}
-              placeholder="Preço de Atacado"
-            />
-            {errors.wholesalePrice && (
-              <span className="text-red-500">
-                {errors.wholesalePrice.message}
-              </span>
-            )}
-          </div>
-
-          <div>
-            <label htmlFor="minQuantity">Quantidade Mínima</label>
-            <Input
-              id="minQuantity"
-              type="number"
-              {...register('minQuantity')}
-              placeholder="Quantidade Mínima"
-            />
-            {errors.minQuantity && (
-              <span className="text-red-500">{errors.minQuantity.message}</span>
-            )}
-          </div>
-
-          <div>
-            <label>Status</label>
-            <div className="flex gap-4">
-              <label htmlFor="ativo">
-                <input
-                  type="radio"
-                  id="ativo"
-                  value="active"
-                  {...register('status')}
-                />
-                Ativo
-              </label>
-              <label htmlFor="inativo">
-                <input
-                  type="radio"
-                  id="inativo"
-                  value="inactive"
-                  {...register('status')}
-                />
-                Inativo
-              </label>
-            </div>
-            {errors.status && (
-              <span className="text-red-500">{errors.status.message}</span>
-            )}
-          </div>
-        </form>
-      </CardContent>
-      <CardFooter className="mt-5 flex flex-col items-center justify-center gap-2">
-        <Button className="w-full" type="submit">
-          <Plus className="mr-2 h-4 w-4" /> Salvar Produto
-        </Button>
-        <Link href="/dashboard">
-          <Button variant={'outline'} className="w-full">
-            <Undo2 className="mr-2 h-4 w-4" /> Voltar
-          </Button>
-        </Link>
-      </CardFooter>
-    </Card>
+            </form>
+          </Form>
+        </div>
+      </div>
+    </>
   )
 }
