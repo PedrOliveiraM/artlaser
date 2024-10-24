@@ -22,6 +22,8 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import formSchema from '../_schema/formSchema'
 import capitalizeWords from '@/functions/capitalizeWords'
+import Link from 'next/link'
+import { Check, Undo2 } from 'lucide-react'
 
 interface IProductDto {
   name: string
@@ -393,8 +395,20 @@ export default function AddProduct() {
                   </FormItem>
                 )}
               />
-
-              <Button type="submit">Salvar Produto</Button>
+              <div className="flex justify-between">
+                <Button
+                  type="button"
+                  variant={'alert'}
+                  className="flex items-center"
+                >
+                  <Undo2 size={20} />
+                  <Link href={'/dashboard'}>Voltar</Link>
+                </Button>
+                <Button type="submit" className="flex items-center">
+                  Salvar Produto
+                  <Check size={20} />
+                </Button>
+              </div>
             </form>
           </Form>
         </div>
