@@ -16,19 +16,16 @@ import { useToast } from '@/hooks/use-toast'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PutBlobResult } from '@vercel/blob'
 import 'cropperjs/dist/cropper.css'
-import { ChangeEvent, useRef, useState } from 'react'
+import { ChangeEvent, useRef, useState } from 'react' // useEffect
 import Cropper, { ReactCropperElement } from 'react-cropper'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import formSchema from '../_schema/formSchema'
-import capitalizeWords from '@/functions/capitalizeWords'
 import Link from 'next/link'
-import { Check, Undo2 } from 'lucide-react'
-import { Decimal } from '@prisma/client/runtime/library'
-import { updatedProduct } from '../_actions/actions'
+import { Check, Undo2 } from 'lucide-react' // AwardIcon,
+import formSchema from '../_schema/formSchema'
+import { useRouter } from 'next/router'
 
-interface IProductDto {
-  id: number
+interface IProductData {
   name: string
   description: string
   category: string
@@ -39,43 +36,47 @@ interface IProductDto {
   status: boolean
 }
 
-interface IParamsProduct {
-  data: {
-    imageUrl: string
-    id: number
-    name: string
-    description: string
-    category: string
-    retailPrice: Decimal
-    status: boolean
-    wholesalePrice: Decimal
-    minQuantity: number
-    CreatedAt: Date
-  }
+interface IProduct {
+  data: IProductData
 }
 
-export default function ProductForm({ data }: IParamsProduct) {
-  console.log(data)
-  const inputFileRef = useRef<HTMLInputElement>(null)
-  const cropperRef = useRef<ReactCropperElement>(null)
-  const [blobResult, setBlobResult] = useState<PutBlobResult | null>(null)
-  const [imageUrl, setImageUrl] = useState<string | null>(null)
+export default function FormProduct({ data }: IProduct) {
+  if (!data) {
+    return <p>Dados do produto não disponíveis.</p>
+  }
 
-  const [uploading, setUploading] = useState<boolean>(false)
-  const { toast } = useToast()
+  const {
+    name,
+    description,
+    category,
+    retailPrice,
+    wholesalePrice,
+    minQuantity,
+    status,
+  } = data
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: data.name || '',
-      description: data.description || '',
-      category: data.category || '',
-      retailPrice: parseFloat(data.retailPrice.toString()) || 0.0,
-      wholesalePrice: parseFloat(data.wholesalePrice.toString()) || 0.0,
-      minQuantity: data.minQuantity || 0,
-      status: data.status ? 'ativo' : 'inativo',
+      name: name || '',
+      description: description || '',
+      category: category || '',
+      retailPrice: retailPrice || 0,
+      wholesalePrice: wholesalePrice || 0,
+      minQuantity: minQuantity || 0,
+      status: status ? 'ativo' : 'inativo',
     },
   })
+
+  const [product, setProduct] = useState<IProductData | null>(data)
+  const [loading, setLoading] = useState<boolean>(false)
+
+  const inputFileRef = useRef<HTMLInputElement>(null)
+  const cropperRef = useRef<ReactCropperElement>(null)
+  const [blobResult, setBlobResult] = useState<PutBlobResult | null>(null)
+  const [imageURL, setImageUrl] = useState<string | null>()
+  const { toast } = useToast()
+  const router = useRouter() // Adicione isso
 
   const handleClosePreview = () => {
     setImageUrl(null)
@@ -85,10 +86,8 @@ export default function ProductForm({ data }: IParamsProduct) {
     const file = event.target.files?.[0]
     if (file) {
       const newImageUrl = URL.createObjectURL(file)
-      setImageUrl(newImageUrl) // Armazena o URL da nova imagem
-      cropperRef.current?.cropper.replace(newImageUrl) // Substitui a imagem no cropper
-    } else {
-      setImageUrl(null) // Se não há arquivo, usa a URL antiga
+      setImageUrl(newImageUrl)
+      cropperRef.current?.cropper.replace(newImageUrl)
     }
   }
 
@@ -143,72 +142,74 @@ export default function ProductForm({ data }: IParamsProduct) {
     }
   }
 
-  const deleteImageFromBlob = async (
-    url: string | undefined,
-  ): Promise<boolean> => {
+  // const deleteImageFromBlob = async (
+  //   url: string | undefined,
+  // ): Promise<boolean> => {
+  //   try {
+  //     const response = await fetch(`/api/blob/upload?url=${url}`, {
+  //       method: 'DELETE',
+  //     })
+
+  //     if (!response.ok) {
+  //       throw new Error(`Failed to delete image: ${response.statusText}`)
+  //     }
+
+  //     return true // Indicate success
+  //   } catch (error) {
+  //     console.error('Error deleting image:', error)
+  //     return false
+  //   }
+  // }
+
+  // const updateProduct = async (
+  //   productData: IProduct,
+  // ): Promise<IProduct | undefined> => {
+  //   try {
+  //     const response = await fetch('/api/products', {
+  //       method: 'PUT',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify(productData),
+  //     })
+
+  //     if (!response.ok) {
+  //       throw new Error('Erro ao criar o produto')
+  //     }
+
+  //     const result: { updatedProduct: IProduct } = await response.json() // Tipando o resultado esperado
+
+  //     return result.updatedProduct
+  //   } catch (error) {
+  //     console.error('Erro:', error)
+  //     return undefined
+  //   }
+  // }
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      const response = await fetch(`/api/blob/upload?url=${url}`, {
-        method: 'DELETE',
-      })
+      setLoading(true)
 
-      if (!response.ok) {
-        throw new Error(`Failed to delete image: ${response.statusText}`)
+      let newImageUrl: PutBlobResult | null = null
+      if (!cropperRef) {
+        newImageUrl = await uploadImageToBlob(values.name)
       }
 
-      return true // Indicate success
-    } catch (error) {
-      console.error('Error deleting image:', error)
-      return false
-    }
-  }
+      setTimeout(() => {}, 3000)
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    try {
-      setUploading(true)
+      console.log('#FORM VALUES', values)
+      console.log('#NEW IMAGE URL', newImageUrl)
+      setLoading(false)
 
-      let finalImageUrl = data.imageUrl // Preserva a URL da imagem antiga
+      setProduct(null)
 
-      // Verifica se uma nova imagem foi carregada
-      if (imageUrl) {
-        const newBlobResult = await uploadImageToBlob(values.name)
-        if (!newBlobResult) throw new Error('Não foi possível enviar a imagem')
-        finalImageUrl = newBlobResult.url
-
-        // Se a imagem foi alterada, exclua a antiga
-        if (data.imageUrl) {
-          await deleteImageFromBlob(data.imageUrl)
-        }
-      }
-
-      const booleanStatus = values.status === 'ativo'
-      const formatName = capitalizeWords(values.name)
-      const formatDescription = capitalizeWords(values.description)
-      const formatCategory = capitalizeWords(values.category)
-
-      const newProductDto: IProductDto = {
-        ...values,
-        id: data.id,
-        name: formatName,
-        category: formatCategory,
-        description: formatDescription,
-        retailPrice: values.retailPrice,
-        wholesalePrice: values.wholesalePrice,
-        status: booleanStatus,
-        imageUrl: finalImageUrl, // Usa a imagem final (nova ou antiga)
-      }
-
-      const product = await updatedProduct(newProductDto)
-      console.log('Returned product:', product)
-
-      setUploading(false)
+      router.push('/dashboard') // Adicione isso
       toast({
         title: 'Salvo com sucesso',
-        description: 'Produto alterado com sucesso!',
+        description: 'Produto criado com sucesso!',
         variant: 'success',
       })
     } catch (error) {
-      setUploading(false)
-      console.error('Error submitting form:', error)
       toast({
         title: 'Erro',
         description: 'Não foi possível salvar o produto! Tente Novamente.',
@@ -217,9 +218,13 @@ export default function ProductForm({ data }: IParamsProduct) {
     }
   }
 
+  if (loading) return <CircularIndeterminate />
+
+  if (!product) return <p>Produto não encontrado</p>
+
   return (
     <>
-      {uploading && <CircularIndeterminate />}
+      {loading && <CircularIndeterminate />}
       <div className="flex min-h-screen flex-col items-center justify-center bg-gray-100 p-4">
         <div className="w-full max-w-lg rounded-lg bg-white p-6 shadow-md">
           <Form {...form}>
@@ -238,7 +243,7 @@ export default function ProductForm({ data }: IParamsProduct) {
                 ref={inputFileRef}
               />
 
-              {imageUrl && ( // Verifica se imageUrl não é nulo
+              {imageURL && ( // Verifica se imageURL não é nulo
                 <>
                   <Cropper
                     className="mb-4 max-h-96"
@@ -251,7 +256,7 @@ export default function ProductForm({ data }: IParamsProduct) {
                     cropBoxResizable
                     autoCropArea={1}
                     background={false}
-                    src={imageUrl} // Define a imagem a ser cortada
+                    src={imageURL} // Define a imagem a ser cortada
                   />
                   <div className="flex justify-between">
                     <Button type="button" onClick={handleClosePreview}>
@@ -271,7 +276,6 @@ export default function ProductForm({ data }: IParamsProduct) {
                       <Input
                         placeholder="Informe o nome do produto"
                         {...field}
-                        defaultValue={'pedro de teixeira'}
                       />
                     </FormControl>
                     <FormMessage />
