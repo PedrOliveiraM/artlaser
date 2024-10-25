@@ -1,24 +1,32 @@
+// /app/api/products/route.ts
+
 import { db } from '@/lib/prisma'
 import { NextResponse } from 'next/server'
+import {
+  CreateProductDTO,
+  UpdateProductDTO,
+  ProductResponseDTO,
+} from '@/app/dto/product.dto'
 
 export async function GET() {
-  const products = await db.product.findMany({})
-  return Response.json(products, {
+  const products: ProductResponseDTO[] = await db.product.findMany({})
+  return NextResponse.json(products, {
     status: 200,
   })
 }
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json()
+    const body: CreateProductDTO = await request.json()
     console.log('DATA RECEBIDA : ', body)
 
     const createdProduct = await db.product.create({
       data: body,
     })
+
     if (!createdProduct) throw new Error('Erro ao criar produto!')
 
-    return Response.json({ createdProduct }, { status: 201 })
+    return NextResponse.json({ createdProduct }, { status: 201 })
   } catch (error) {
     console.error('Erro ao processar requisição:', error)
     return NextResponse.json(
@@ -26,29 +34,65 @@ export async function POST(request: Request) {
       { status: 500 },
     )
   }
-} // Adjust the import path to your actual db setup
+}
 
 export async function PUT(request: Request) {
   try {
-    const body = await request.json()
+    const body: UpdateProductDTO = await request.json()
     console.log('DATA RECEIVED BY PUT:', body)
 
-    // Assuming you have the product ID and fields to update in the body
     const { id, ...updateData } = body
 
-    // Update the product in the database
+    // Verifica se o ID foi fornecido
+    if (!id) {
+      return NextResponse.json(
+        { message: 'ID do produto é obrigatório' },
+        { status: 400 },
+      )
+    }
+
+    // Atualiza o produto no banco de dados
     const updatedProduct = await db.product.update({
-      where: { id }, // Ensure that the product ID is passed correctly
-      data: updateData, // The fields to update
+      where: { id },
+      data: updateData,
     })
 
-    if (!updatedProduct) throw new Error('Error updating product!')
+    if (!updatedProduct) throw new Error('Erro ao atualizar produto!')
 
     return NextResponse.json({ updatedProduct }, { status: 200 })
   } catch (error) {
     console.error('Error processing request:', error)
     return NextResponse.json(
-      { message: 'Internal Server Error' },
+      { message: 'Erro interno do servidor' },
+      { status: 500 },
+    )
+  }
+}
+
+export async function DELETE(request: Request) {
+  try {
+    const body: { id: number } = await request.json()
+    const { id } = body
+
+    if (!id) {
+      return NextResponse.json(
+        { message: 'ID do produto é obrigatório' },
+        { status: 400 },
+      )
+    }
+
+    await db.product.delete({
+      where: { id },
+    })
+
+    return NextResponse.json(
+      { message: 'Produto excluído com sucesso!' },
+      { status: 200 },
+    )
+  } catch (error) {
+    console.error('Error processing request:', error)
+    return NextResponse.json(
+      { message: 'Erro interno do servidor' },
       { status: 500 },
     )
   }
