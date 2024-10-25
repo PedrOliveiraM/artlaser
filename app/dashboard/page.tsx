@@ -24,7 +24,6 @@ export default function DashBoard() {
         const data = await res.json()
         setProducts(data)
       } catch (error) {
-        console.error(error)
         toast({
           title: 'Erro',
           description: 'Não foi possível listar os produtos.',
@@ -45,7 +44,6 @@ export default function DashBoard() {
         const data = await res.json()
         setBanners(data)
       } catch (error) {
-        console.error(error)
         toast({
           title: 'Erro',
           description: 'Não foi possível listar os banners.',
