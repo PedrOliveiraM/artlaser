@@ -1,4 +1,3 @@
-// page.tsx
 'use client'
 
 import { Banner, Product } from '@prisma/client'
@@ -6,13 +5,15 @@ import { useEffect, useState } from 'react'
 import { ProductsTable } from './_components/Products-table'
 import { BannersTable } from './_components/Banners-table'
 import DashboardLayout from './dashboardLayout'
-import { useToast } from '@/hooks/use-toast' // Importando o useToast
+import { useToast } from '@/hooks/use-toast'
+import CircularIndeterminate from '@/components/loading'
 
 export default function DashBoard() {
   const [products, setProducts] = useState<Product[]>([])
   const [banners, setBanners] = useState<Banner[]>([])
   const [filter, setFilter] = useState('')
-  const { toast } = useToast() // Inicializando o toast
+  const { toast } = useToast()
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -29,10 +30,12 @@ export default function DashBoard() {
           description: 'Não foi possível listar os produtos.',
           variant: 'destructive',
         })
+      } finally {
+        setLoading(false)
       }
     }
     fetchProducts()
-  }, [toast]) // Adicionando toast como dependência
+  }, [])
 
   useEffect(() => {
     const fetchBanners = async () => {
@@ -52,7 +55,15 @@ export default function DashBoard() {
       }
     }
     fetchBanners()
-  }, [toast]) // Adicionando toast como dependência
+  }, [])
+
+  if (loading) {
+    return (
+      <>
+        <CircularIndeterminate />
+      </>
+    )
+  }
 
   return (
     <DashboardLayout onFilterChange={setFilter}>
