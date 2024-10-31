@@ -1,23 +1,28 @@
 'use client'
-import { Button } from '@/components/ui/button'
-import Link from 'next/link'
+import { Product } from '@prisma/client'
+import { columns } from './dashboard/_components/Product-columns'
+import { DataTable } from './dashboard/_components/Product-data-table'
+import { useEffect, useState } from 'react'
 
 export default function Home() {
+  const [data, setData] = useState<Product[]>([])
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch('/api/products')
+        const result = await response.json()
+        setData(result)
+      } catch (error) {
+        console.error('Error fetching data:', error)
+      }
+    }
+
+    fetchData()
+  }, [])
   return (
-    <>
-      <div className="flex h-screen items-center justify-center">
-        <div className="flex flex-col">
-          <h1 className="text-center text-3xl font-bold">HOME PAGE</h1>
-          <div className="flex gap-3">
-            <Button asChild>
-              <Link href="/dashboard">Dashboard</Link>
-            </Button>
-            <Button asChild>
-              <Link href="/dashboard/add-product">Adicionar Produto</Link>
-            </Button>
-          </div>
-        </div>
-      </div>
-    </>
+    <div className="container mx-auto py-10">
+      <DataTable columns={columns} data={data} />
+    </div>
   )
 }
