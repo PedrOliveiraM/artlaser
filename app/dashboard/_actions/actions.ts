@@ -42,14 +42,14 @@ export async function updateBannerStatus(id: number) {
     data: updatedBanner,
   }
 }
-export async function updateProductStatus(id: number) {
+export async function updateProductStatus(id: string) {
   try {
-    const product = await db.product.findUnique({ where: { id } })
+    const product = await db.product.findUnique({ where: { id: Number(id) } })
 
     if (!product) throw new Error(`The Id Product ${id} not found`)
 
     const updatedProduct = await db.product.update({
-      where: { id },
+      where: { id: Number(id) },
       data: {
         status: !product.status,
       },
@@ -65,9 +65,9 @@ export async function updateProductStatus(id: number) {
   }
 }
 
-export async function getProductById(id: number) {
+export async function getProductById(id: string) {
   try {
-    const product = await db.product.findUnique({ where: { id } })
+    const product = await db.product.findUnique({ where: { id: Number(id) } })
 
     if (!product) throw new Error(`The Id Product ${id} not found`)
 
