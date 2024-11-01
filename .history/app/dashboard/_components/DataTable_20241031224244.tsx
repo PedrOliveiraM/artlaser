@@ -90,7 +90,7 @@ export function DataTable<TData, TValue>({
           onChange={(event) =>
             table.getColumn('name')?.setFilterValue(event.target.value)
           }
-          className="max-w-sm shadow-md"
+          className="max-w-sm"
         />
         <Button asChild>
           <Link href="/dashboard/add-product">Adicionar Produto</Link>
@@ -175,7 +175,8 @@ export function DataTable<TData, TValue>({
       </div>
       <div className="flex items-center justify-end space-x-2 py-4">
         <div className="flex-1 text-sm text-muted-foreground">
-          Mostrando 10 de {table.getFilteredRowModel().rows.length} Produtos
+          {table.getFilteredSelectedRowModel().rows.length} of{' '}
+          {table.getFilteredRowModel().rows.length} row(s) selected.
         </div>
         <div className="flex items-center gap-3">
           <Button
@@ -183,7 +184,7 @@ export function DataTable<TData, TValue>({
             size="sm"
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
-            className="shadow-md"
+            
           >
             <ChevronsLeft />
             Anterior
@@ -193,7 +194,6 @@ export function DataTable<TData, TValue>({
             size="sm"
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
-            className="shadow-md"
           >
             Próximo
             <ChevronsRight />

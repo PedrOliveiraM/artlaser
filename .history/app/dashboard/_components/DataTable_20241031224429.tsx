@@ -93,7 +93,7 @@ export function DataTable<TData, TValue>({
           className="max-w-sm shadow-md"
         />
         <Button asChild>
-          <Link href="/dashboard/add-product">Adicionar Produto</Link>
+          <Link className= href="/dashboard/add-product">Adicionar Produto</Link>
         </Button>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -175,7 +175,8 @@ export function DataTable<TData, TValue>({
       </div>
       <div className="flex items-center justify-end space-x-2 py-4">
         <div className="flex-1 text-sm text-muted-foreground">
-          Mostrando 10 de {table.getFilteredRowModel().rows.length} Produtos
+          {table.getFilteredSelectedRowModel().rows.length} of{' '}
+          {table.getFilteredRowModel().rows.length} row(s) selected.
         </div>
         <div className="flex items-center gap-3">
           <Button

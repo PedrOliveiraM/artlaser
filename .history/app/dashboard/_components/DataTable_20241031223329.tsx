@@ -12,7 +12,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import { ChevronDownIcon, ChevronsLeft, ChevronsRight } from 'lucide-react'
+import { ChevronDownIcon } from 'lucide-react'
 import * as React from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -32,7 +32,6 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Decimal } from '@prisma/client/runtime/library'
-import Link from 'next/link'
 
 export type ProductData = {
   id: number
@@ -83,18 +82,15 @@ export function DataTable<TData, TValue>({
 
   return (
     <div className="w-full">
-      <div className="flex items-center gap-3 py-4">
+      <div className="flex items-center py-4">
         <Input
           placeholder="Procurar por nome"
           value={(table.getColumn('name')?.getFilterValue() as string) ?? ''}
           onChange={(event) =>
             table.getColumn('name')?.setFilterValue(event.target.value)
           }
-          className="max-w-sm shadow-md"
+          className="max-w-sm"
         />
-        <Button asChild>
-          <Link href="/dashboard/add-product">Adicionar Produto</Link>
-        </Button>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">
@@ -129,7 +125,7 @@ export function DataTable<TData, TValue>({
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead key={header.id} className="text-center">
+                    <TableHead key={header.id}>
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -148,10 +144,9 @@ export function DataTable<TData, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && 'selected'}
-                  className="hover:bg-gray-100"
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="text-center">
+                    <TableCell key={cell.id} className='flex jus'>
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext(),
@@ -175,28 +170,25 @@ export function DataTable<TData, TValue>({
       </div>
       <div className="flex items-center justify-end space-x-2 py-4">
         <div className="flex-1 text-sm text-muted-foreground">
-          Mostrando 10 de {table.getFilteredRowModel().rows.length} Produtos
+          {table.getFilteredSelectedRowModel().rows.length} of{' '}
+          {table.getFilteredRowModel().rows.length} row(s) selected.
         </div>
-        <div className="flex items-center gap-3">
+        <div className="space-x-2">
           <Button
             variant="outline"
             size="sm"
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
-            className="shadow-md"
           >
-            <ChevronsLeft />
-            Anterior
+            Previous
           </Button>
           <Button
             variant="outline"
             size="sm"
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
-            className="shadow-md"
           >
-            Próximo
-            <ChevronsRight />
+            Next
           </Button>
         </div>
       </div>
