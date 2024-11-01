@@ -5,7 +5,6 @@ import Image from 'next/image'
 import DropdownMenuTable from './DropdownMenu-table'
 import { Button } from '@/components/ui/button'
 import { ArrowUpDown } from 'lucide-react'
-import { Badge } from '@/components/ui/badge'
 
 export type ProductData = {
   id: number
@@ -118,11 +117,10 @@ export const columns = (fetchData: () => void): ColumnDef<ProductData>[] => [
       </Button>
     ),
     cell: ({ row }) => (
-      <Badge variant={row.getValue('status') ? 'success' : 'destructive'}>
-        <div className="min-w-10 text-center capitalize">
-          {row.getValue('status') ? 'Ativo' : 'Inativo'}
-        </div>
-      </Badge>
+      <Badg
+      <div className="capitalize">
+        {row.getValue('status') ? 'Ativo' : 'Inativo'}
+      </div>
     ),
   },
   {

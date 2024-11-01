@@ -119,7 +119,7 @@ export const columns = (fetchData: () => void): ColumnDef<ProductData>[] => [
     ),
     cell: ({ row }) => (
       <Badge variant={row.getValue('status') ? 'success' : 'destructive'}>
-        <div className="min-w-10 text-center capitalize">
+        <div className="capitalize ">
           {row.getValue('status') ? 'Ativo' : 'Inativo'}
         </div>
       </Badge>
