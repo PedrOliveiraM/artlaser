@@ -21,7 +21,7 @@ export default function Home() {
       toast({
         variant: 'success',
         title: 'Sucesso',
-        description: 'Produtos carregados com sucesso.',
+        description: 'Friday, February 10, 2023 at 5:57 PM',
       })
     } catch (error) {
       toast({

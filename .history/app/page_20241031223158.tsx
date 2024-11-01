@@ -20,8 +20,8 @@ export default function Home() {
       setLoading(false)
       toast({
         variant: 'success',
-        title: 'Sucesso',
-        description: 'Produtos carregados com sucesso.',
+        title: 'Scheduled: Catch up',
+        description: 'Friday, February 10, 2023 at 5:57 PM',
       })
     } catch (error) {
       toast({

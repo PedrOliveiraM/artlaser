@@ -21,7 +21,7 @@ export default function Home() {
       toast({
         variant: 'success',
         title: 'Sucesso',
-        description: 'Produtos carregados com sucesso.',
+        description: 'P',
       })
     } catch (error) {
       toast({
