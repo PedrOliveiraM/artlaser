@@ -22,7 +22,7 @@ export default function Home() {
   }, [])
 
   return (
-    <div className="container mx-auto w-3/4 md:w-full">
+    <div className="md:full container mx-auto w-3/4">
       <DataTable columns={columns(fetchData)} data={data} />
     </div>
   )
