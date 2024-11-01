@@ -5,17 +5,27 @@ export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } },
 ) {
-  try {
-    const { id } = params
+  const { id } = params
 
+  if (!id) {
+    return NextResponse.json({ message: 'ID is required' }, { status: 400 })
+  }
+
+  try {
     const product = await db.product.findUnique({
       where: { id: parseInt(id) },
     })
 
-    if (!product) throw new Error('Error updating product!')
+    if (!product) {
+      return NextResponse.json(
+        { message: 'Product not found' },
+        { status: 404 },
+      )
+    }
 
     return NextResponse.json({ product }, { status: 200 })
   } catch (error) {
+    console.error('Error fetching product:', error)
     return NextResponse.json(
       { message: 'Internal Server Error' },
       { status: 500 },
