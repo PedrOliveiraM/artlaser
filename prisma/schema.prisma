@@ -41,7 +41,7 @@ model Product {
 model Banner {
   id        Int     @id @default(autoincrement())
   name      String
-  imagePath String
+  imageUrl String  @default("default_image_url")
   status    Boolean
 
   @@map("banner")
