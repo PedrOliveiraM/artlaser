@@ -25,7 +25,7 @@ export default function Home() {
     fetchData()
   }, [])
 
-  if (loading) return <Loading />
+  if (loading) return <Loading>
   return (
     <div className="container mx-auto w-3/4 p-5 md:w-full">
       <DataTable columns={columns(fetchData)} data={data} />

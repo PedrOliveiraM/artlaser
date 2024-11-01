@@ -3,7 +3,6 @@ import { Product } from '@prisma/client'
 import { useEffect, useState } from 'react'
 import { columns } from './dashboard/_components/Product-columns'
 import { DataTable } from './dashboard/_components/DataTable'
-import Loading from '@/components/loading'
 
 export default function Home() {
   const [data, setData] = useState<Product[]>([])
@@ -25,7 +24,7 @@ export default function Home() {
     fetchData()
   }, [])
 
-  if (loading) return <Loading />
+  if (loading) return <div>Loading...</div>
   return (
     <div className="container mx-auto w-3/4 p-5 md:w-full">
       <DataTable columns={columns(fetchData)} data={data} />

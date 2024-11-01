@@ -3,19 +3,15 @@ import { Product } from '@prisma/client'
 import { useEffect, useState } from 'react'
 import { columns } from './dashboard/_components/Product-columns'
 import { DataTable } from './dashboard/_components/DataTable'
-import Loading from '@/components/loading'
 
 export default function Home() {
   const [data, setData] = useState<Product[]>([])
-  const [loading, setLoading] = useState(true)
 
   const fetchData = async () => {
     try {
-      setLoading(true)
       const response = await fetch('/api/products')
       const result = await response.json()
       setData(result)
-      setLoading(false)
     } catch (error) {
       console.error('Error fetching data:', error)
     }
@@ -25,9 +21,8 @@ export default function Home() {
     fetchData()
   }, [])
 
-  if (loading) return <Loading />
   return (
-    <div className="container mx-auto w-3/4 p-5 md:w-full">
+    <div className="container mx-auto w-3/4 md:w-full p-">
       <DataTable columns={columns(fetchData)} data={data} />
     </div>
   )
