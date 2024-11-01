@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { columns } from './dashboard/_components/Product-columns'
 import { DataTable } from './dashboard/_components/DataTable'
 import Loading from '@/components/loading'
-import { useToast } from '@/hooks/use-toast'
+import { toast, useToast } from '@/hooks/use-toast'
 
 export default function Home() {
   const [data, setData] = useState<Product[]>([])
@@ -18,15 +18,10 @@ export default function Home() {
       const result = await response.json()
       setData(result)
       setLoading(false)
+    } catch (error) {
       toast({
         title: 'Scheduled: Catch up',
         description: 'Friday, February 10, 2023 at 5:57 PM',
-      })
-    } catch (error) {
-      toast({
-        variant: 'destructive',
-        title: 'Uh oh! Something went wrong.',
-        description: 'There was a problem with your request.',
       })
     }
   }

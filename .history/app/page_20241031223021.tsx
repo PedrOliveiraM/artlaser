@@ -24,9 +24,9 @@ export default function Home() {
       })
     } catch (error) {
       toast({
-        variant: 'destructive',
-        title: 'Uh oh! Something went wrong.',
-        description: 'There was a problem with your request.',
+        var
+        title: 'Scheduled: Catch up',
+        description: 'Friday, February 10, 2023 at 5:57 PM',
       })
     }
   }
