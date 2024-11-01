@@ -1,22 +1,24 @@
 'use client'
-import { Product } from '@prisma/client'
+import { Banner, Product } from '@prisma/client'
 import { useEffect, useState } from 'react'
-import { columns } from './dashboard/_components/Product-columns'
 import { DataTable } from './dashboard/_components/DataTable'
 import Loading from '@/components/loading'
 import { useToast } from '@/hooks/use-toast'
+import { Productcolumns } from './dashboard/_components/Product-columns'
+import { BannerColumns } from './dashboard/_components/Banner-Columns'
 
 export default function Home() {
-  const [data, setData] = useState<Product[]>([])
+  const [dataProducts, setDataProducts] = useState<Product[]>([])
+  const [dataBanners, setDataBanners] = useState<Banner[]>([])
   const [loading, setLoading] = useState(true)
   const { toast } = useToast()
 
-  const fetchData = async () => {
+  const fetchDataProducts = async () => {
     try {
       setLoading(true)
       const response = await fetch('/api/products')
       const result = await response.json()
-      setData(result)
+      setDataProducts(result)
       setLoading(false)
       toast({
         variant: 'success',
@@ -31,15 +33,46 @@ export default function Home() {
       })
     }
   }
+  const fetchDataBanners = async () => {
+    try {
+      setLoading(true)
+      const response = await fetch('/api/banners')
+      const result = await response.json()
+      setDataBanners(result)
+      setLoading(false)
+      toast({
+        variant: 'success',
+        title: 'Sucesso',
+        description: 'Banners carregados com sucesso.',
+      })
+    } catch (error) {
+      toast({
+        variant: 'destructive',
+        title: 'Uh oh! Something went wrong.',
+        description: 'There was a problem with your request.',
+      })
+    }
+  }
 
   useEffect(() => {
-    fetchData()
+    fetchDataProducts()
+    fetchDataBanners()
   }, [])
 
   if (loading) return <Loading />
   return (
     <div className="container mx-auto w-3/4 p-5 md:w-full">
-      <DataTable columns={columns(fetchData)} data={data} />
+      <DataTable
+        columns={Productcolumns(fetchDataProducts)}
+        data={dataProducts}
+        title="Produtos"
+      />
+
+      <DataTable
+        columns={BannerColumns(fetchDataBanners)}
+        data={dataBanners}
+        title="Banners"
+      />
     </div>
   )
 }
