@@ -50,7 +50,13 @@ export const columns = (fetchData: () => void): ColumnDef<ProductData>[] => [
         <ArrowUpDown className="ml-2 h-4 w-4" />
       </Button>
     ),
+    cell: ({ row }) => (
+      <div className="flex justify-center">
+        <span className="max-w-36">{row.getValue('name')}</span>
+      </div>
+    ),
   },
+
   {
     accessorKey: 'retailPrice',
     header: ({ column }) => (
