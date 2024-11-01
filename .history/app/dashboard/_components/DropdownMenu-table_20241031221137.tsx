@@ -21,7 +21,6 @@ export default function DropdownMenuTable({ id, status, fetchData }: IParams) {
   async function toggleProductStatus(id: string) {
     try {
       await updateProductStatus(id)
-      fetchData()
     } catch (error) {
       console.error('Error updating banner status:', error)
     }

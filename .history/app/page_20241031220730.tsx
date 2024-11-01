@@ -2,7 +2,7 @@
 import { Product } from '@prisma/client'
 import { useEffect, useState } from 'react'
 import { columns } from './dashboard/_components/Product-columns'
-import { DataTable } from './dashboard/_components/DataTable'
+import { DataTable } from './dashboard/_components/Product-data-table'
 
 export default function Home() {
   const [data, setData] = useState<Product[]>([])

@@ -15,7 +15,7 @@ export type ProductData = {
   category: string
 }
 
-export const columns = (fetchData: () => void): ColumnDef<ProductData>[] => [
+export const columns: ColumnDef<ProductData>[] = [
   {
     accessorKey: 'imageUrl',
     header: 'Imagem',
@@ -97,7 +97,6 @@ export const columns = (fetchData: () => void): ColumnDef<ProductData>[] => [
         <DropdownMenuTable
           id={productId.toString()} // Passe o id para o Dropdown
           status={productStatus}
-          fetchData={fetchData}
         />
       )
     },

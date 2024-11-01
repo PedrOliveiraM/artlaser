@@ -17,11 +17,12 @@ interface IParams {
   fetchData: () => void
 }
 
-export default function DropdownMenuTable({ id, status, fetchData }: IParams) {
+export default function DropdownMenuTable({ id, status }: IParams) {
+  console.log('PARAMS:', id, status)
+
   async function toggleProductStatus(id: string) {
     try {
       await updateProductStatus(id)
-      fetchData()
     } catch (error) {
       console.error('Error updating banner status:', error)
     }

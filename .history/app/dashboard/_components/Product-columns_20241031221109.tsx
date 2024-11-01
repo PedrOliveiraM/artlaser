@@ -97,7 +97,6 @@ export const columns = (fetchData: () => void): ColumnDef<ProductData>[] => [
         <DropdownMenuTable
           id={productId.toString()} // Passe o id para o Dropdown
           status={productStatus}
-          fetchData={fetchData}
         />
       )
     },
