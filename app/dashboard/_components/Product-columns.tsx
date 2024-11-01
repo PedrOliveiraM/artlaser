@@ -18,7 +18,9 @@ export type ProductData = {
   category: string
 }
 
-export const columns = (fetchData: () => void): ColumnDef<ProductData>[] => [
+export const Productcolumns = (
+  fetchData: () => void,
+): ColumnDef<ProductData>[] => [
   {
     accessorKey: 'imageUrl',
     header: 'Imagem',

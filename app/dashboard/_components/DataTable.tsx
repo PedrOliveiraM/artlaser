@@ -45,14 +45,23 @@ export type ProductData = {
   category: string
 }
 
+export type BannerData = {
+  id: number
+  name: string
+  imageUrl: string
+  status: boolean
+}
+
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
+  title: string
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  title: TTitle,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -93,7 +102,7 @@ export function DataTable<TData, TValue>({
           className="max-w-sm shadow-md"
         />
         <Button asChild>
-          <Link href="/dashboard/add-product">Adicionar Produto</Link>
+          <Link href="/dashboard/add-product">Adicionar {TTitle}</Link>
         </Button>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
