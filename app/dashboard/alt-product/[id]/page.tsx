@@ -13,46 +13,84 @@ import { Input } from '@/components/ui/input'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Textarea } from '@/components/ui/textarea'
 import { useToast } from '@/hooks/use-toast'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { PutBlobResult } from '@vercel/blob'
 import 'cropperjs/dist/cropper.css'
-import { ChangeEvent, useRef, useState, useEffect } from 'react'
+import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import Cropper, { ReactCropperElement } from 'react-cropper'
-
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
 import capitalizeWords from '@/functions/capitalizeWords'
 import Link from 'next/link'
 import { Check, Undo2 } from 'lucide-react'
 import formSchema from '../../_schema/formSchema'
 import { Product } from '@prisma/client'
-import { z } from 'zod'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
 
-interface IProduct {
+interface IProductDto {
   name: string
   description: string
   category: string
   retailPrice: number
   wholesalePrice: number
   minQuantity: number
+  imageUrl: string
   status: boolean
-  imageUrl?: string
 }
 interface IParams {
   id: string
 }
 
-export default function AltProduct({ params: { id } }: { params: IParams }) {
-  const [uploading, setUploading] = useState<boolean>(false)
+export default function AltProduct({ params }: { params: IParams }) {
+  const { id } = params
+
   const inputFileRef = useRef<HTMLInputElement>(null)
   const cropperRef = useRef<ReactCropperElement>(null)
   const [blobResult, setBlobResult] = useState<PutBlobResult | null>(null)
   const [imageUrl, setImageUrl] = useState<string | null>(null)
-  // Parte de products
-  const [product, setProduct] = useState<Product | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | unknown>(null)
+
+  const [uploading, setUploading] = useState<boolean>(false)
   const { toast } = useToast()
 
+  const [products, setProduct] = useState<Product | null>(null)
+
+  useEffect(() => {
+    async function fetchPosts() {
+      try {
+        const res = await fetch(`/api/products/${id}`)
+        if (!res.ok) throw new Error('Failed to fetch product')
+        const data = await res.json()
+        setProduct(data as Product)
+      } catch (error) {
+        console.error('Error fetching product:', error)
+      }
+    }
+
+    if (!products) {
+      // Faz a requisição apenas se products for null
+      fetchPosts()
+    }
+  }, [id]) // Remove 'products' da dependência
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: products?.name,
+      description: products?.description,
+      category: products?.category,
+      retailPrice: Number(products?.retailPrice),
+      wholesalePrice: Number(products?.wholesalePrice),
+      minQuantity: products?.minQuantity,
+      status: products?.status ? 'ativo' : 'inativo',
+    },
+  })
+
+  if (!products) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <CircularIndeterminate />
+      </div>
+    )
+  }
   const handleClosePreview = () => {
     setImageUrl(null)
   }
@@ -136,12 +174,12 @@ export default function AltProduct({ params: { id } }: { params: IParams }) {
     }
   }
 
-  const updateProduct = async (
-    productData: IProduct,
-  ): Promise<IProduct | undefined> => {
+  const createProduct = async (
+    productData: IProductDto,
+  ): Promise<IProductDto | undefined> => {
     try {
       const response = await fetch('/api/products', {
-        method: 'PUT',
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -152,7 +190,7 @@ export default function AltProduct({ params: { id } }: { params: IParams }) {
         throw new Error('Erro ao criar o produto')
       }
 
-      const result: { createdProduct: IProduct } = await response.json() // Tipando o resultado esperado
+      const result: { createdProduct: IProductDto } = await response.json() // Tipando o resultado esperado
 
       return result.createdProduct
     } catch (error) {
@@ -178,7 +216,7 @@ export default function AltProduct({ params: { id } }: { params: IParams }) {
       const formatDescription = capitalizeWords(values.description)
       const formatCategory = capitalizeWords(values.category)
 
-      const newProductDto: IProduct = {
+      const newProductDto: IProductDto = {
         ...values,
         name: formatName,
         category: formatCategory,
@@ -189,7 +227,7 @@ export default function AltProduct({ params: { id } }: { params: IParams }) {
         imageUrl,
       }
 
-      const createdProduct = await updateProduct(newProductDto)
+      const createdProduct = await createProduct(newProductDto)
 
       if (!createdProduct) throw new Error('Não foi possível criar o produto')
 
@@ -210,51 +248,6 @@ export default function AltProduct({ params: { id } }: { params: IParams }) {
     }
   }
 
-  useEffect(() => {
-    const fetchProduct = async () => {
-      try {
-        const response = await fetch(`/api/products/${id}`)
-
-        if (!response.ok) {
-          throw new Error('Falha ao buscar o produto')
-        }
-        const product = (await response.json()) as Product
-        setProduct(product)
-
-        console.log('#Useffect# PRODUCT:', product)
-      } catch (error) {
-        setError(error instanceof Error ? error.message : 'Erro desconhecido')
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchProduct()
-  }, [])
-
-  console.log('PRODUTO DEPOIS DO CODIGO DO USEFECT', product)
-
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: product?.name || 'PEDRO',
-      description: product?.description || 'descricao',
-      category: product?.category || 'PEDRO',
-      retailPrice: Number(product?.retailPrice) || 30,
-      wholesalePrice: Number(product?.wholesalePrice) || 110,
-      minQuantity: product?.minQuantity || 777,
-      status: product?.status ? 'ativo' : 'inativo',
-    },
-  })
-
-  console.log('PRODUTO DEPOIS DO FORM', product)
-
-  if (loading) return <CircularIndeterminate />
-
-  if (error) return <p>Error !!!</p>
-
-  if (!product) return <CircularIndeterminate />
-
   return (
     <>
       {uploading && <CircularIndeterminate />}
@@ -266,7 +259,7 @@ export default function AltProduct({ params: { id } }: { params: IParams }) {
               className="space-y-4 p-5"
             >
               <h1 className="text-center text-2xl font-bold">
-                Alterar Produto
+                Cadastrar Produto
               </h1>
               <input
                 type="file"
