@@ -24,7 +24,15 @@ const formSchema = z.object({
     .trim(),
   retailPrice: z.preprocess(
     (value) => Number(value),
-    z.number().positive({ message: 'Informe uma quantidade válida' }),
+    z
+      .number()
+      .positive({ message: 'O Preço deve ser maior que R$ 0.00' })
+      .min(0, {
+        message: 'Esse campo precisa de um preço válido',
+      })
+      .max(1000000, {
+        message: 'O valor máximo suportado é R$ 1.000.000',
+      }),
   ),
   wholesalePrice: z.preprocess(
     (value) => Number(value),
@@ -42,12 +50,12 @@ const formSchema = z.object({
     (value) => Number(value),
     z
       .number()
-      .positive({ message: 'O Preço deve ser maior que R$ 0.00' })
+      .positive({ message: 'Informe uma quantidade válida' })
       .min(0, {
-        message: 'Esse campo precisa de um preço válido',
+        message: 'Esse campo precisa de um valor válido',
       })
       .max(1000000, {
-        message: 'O valor máximo suportado é R$ 1.000.000',
+        message: 'O valor máximo suportado é 1.000.000',
       }),
   ),
   status: z.enum(['ativo', 'inativo']),
