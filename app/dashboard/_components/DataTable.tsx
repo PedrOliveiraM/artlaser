@@ -108,6 +108,8 @@ export function DataTable<TData, TValue>({
     actions: 'Ações',
   }
 
+  const typeRoute = TTitle.toLowerCase() === 'produtos' ? 'product' : 'banner'
+
   return (
     <div className="w-full">
       <div className="flex flex-col gap-3 py-4 md:flex-row md:items-center">
@@ -120,9 +122,7 @@ export function DataTable<TData, TValue>({
           className="max-w-sm shadow-md"
         />
         <Button asChild>
-          <Link href={`/dashboard/add-${TTitle.toLowerCase()}`}>
-            Adicionar {TTitle}
-          </Link>
+          <Link href={`/dashboard/add-${typeRoute}`}>Adicionar {TTitle}</Link>
         </Button>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -206,7 +206,7 @@ export function DataTable<TData, TValue>({
       </div>
       <div className="flex items-center justify-end space-x-2 py-4">
         <div className="flex-1 text-sm text-muted-foreground">
-          Mostrando {table.getFilteredRowModel().rows.length} de {data.length}
+          Mostrando {table.getFilteredRowModel().rows.length} de {data.length}{' '}
           {TTitle.toLowerCase()}.
         </div>
         <div className="flex flex-col items-center gap-3 md:flex-row">
