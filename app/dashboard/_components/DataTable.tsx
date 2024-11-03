@@ -92,7 +92,7 @@ export function DataTable<TData, TValue>({
 
   return (
     <div className="w-full">
-      <div className="flex items-center gap-3 py-4">
+      <div className="flex flex-col gap-3 py-4 md:flex-row md:items-center">
         <Input
           placeholder="Procurar por nome"
           value={(table.getColumn('name')?.getFilterValue() as string) ?? ''}
@@ -107,7 +107,7 @@ export function DataTable<TData, TValue>({
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">
-              Columns <ChevronDownIcon className="ml-2 h-4 w-4" />
+              Colunas <ChevronDownIcon className="ml-2 h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
@@ -184,9 +184,10 @@ export function DataTable<TData, TValue>({
       </div>
       <div className="flex items-center justify-end space-x-2 py-4">
         <div className="flex-1 text-sm text-muted-foreground">
-          Mostrando 10 de {table.getFilteredRowModel().rows.length} Produtos
+          Mostrando {table.getFilteredRowModel().rows.length} de {data.length}
+          {TTitle.toLowerCase()}.
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col items-center gap-3 md:flex-row">
           <Button
             variant="outline"
             size="sm"
