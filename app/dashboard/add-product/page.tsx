@@ -24,6 +24,7 @@ import formSchema from '../_schema/formSchema'
 import capitalizeWords from '@/functions/capitalizeWords'
 import Link from 'next/link'
 import { Check, Undo2 } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 
 interface IProductDto {
   name: string
@@ -44,6 +45,7 @@ export default function AddProduct() {
 
   const [uploading, setUploading] = useState<boolean>(false)
   const { toast } = useToast()
+  const router = useRouter()
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -204,6 +206,8 @@ export default function AddProduct() {
         description: 'Produto criado com sucesso!',
         variant: 'success',
       })
+
+      router.push('/dashboard')
     } catch (error) {
       setUploading(false)
       console.error('Error submitting form:', error)
