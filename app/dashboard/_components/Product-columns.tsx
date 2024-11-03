@@ -61,6 +61,7 @@ export const Productcolumns = (
 
   {
     accessorKey: 'retailPrice',
+    sortingFn: 'alphanumeric',
     header: ({ column }) => (
       <Button
         variant="ghost"
@@ -80,7 +81,8 @@ export const Productcolumns = (
     },
   },
   {
-    accessorKey: 'wholesalePrice', // Corrigido para "wholesalePrice"
+    accessorKey: 'wholesalePrice',
+    sortingFn: 'alphanumeric',
     header: ({ column }) => (
       <Button
         variant="ghost"
@@ -101,6 +103,8 @@ export const Productcolumns = (
   },
   {
     accessorKey: 'minQuantity',
+    sortingFn: 'alphanumeric',
+
     header: ({ column }) => (
       <Button
         variant="ghost"
