@@ -24,7 +24,7 @@ export const BannerColumns = (
       if (!imageUrl) return ' '
       console.log(imageUrl)
       return (
-        <div className="flex items-center">
+        <div className="flex items-center justify-center">
           <Image
             src={imageUrl}
             alt="Product Image"
