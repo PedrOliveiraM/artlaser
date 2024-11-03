@@ -90,6 +90,24 @@ export function DataTable<TData, TValue>({
     },
   })
 
+  const columnNamesBanner: Record<string, string> = {
+    imageUrl: 'Imagem',
+    name: 'Nome do Banner',
+    status: 'Status',
+    actions: 'Ações',
+  }
+
+  const columnNamesProduct: Record<string, string> = {
+    imageUrl: 'Imagem',
+    name: 'Nome do Produto',
+    status: 'Status',
+    retailPrice: 'Preço de Varejo',
+    wholesalePrice: 'Preço de Atacado',
+    minQuantity: 'Quantidade Mínima',
+    category: 'Categoria',
+    actions: 'Ações',
+  }
+
   return (
     <div className="w-full">
       <div className="flex flex-col gap-3 py-4 md:flex-row md:items-center">
@@ -102,7 +120,9 @@ export function DataTable<TData, TValue>({
           className="max-w-sm shadow-md"
         />
         <Button asChild>
-          <Link href="/dashboard/add-product">Adicionar {TTitle}</Link>
+          <Link href={`/dashboard/add-${TTitle.toLowerCase()}`}>
+            Adicionar {TTitle}
+          </Link>
         </Button>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -124,7 +144,9 @@ export function DataTable<TData, TValue>({
                       column.toggleVisibility(!!value)
                     }
                   >
-                    {column.id}
+                    {TTitle === 'Banner'
+                      ? columnNamesBanner[column.id] || column.id
+                      : columnNamesProduct[column.id] || column.id}
                   </DropdownMenuCheckboxItem>
                 )
               })}
