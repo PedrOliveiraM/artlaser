@@ -156,6 +156,7 @@ export const Productcolumns = (
         <DropdownMenuTable
           id={productId.toString()}
           status={productStatus}
+          type="product"
           fetchData={fetchData}
         />
       )

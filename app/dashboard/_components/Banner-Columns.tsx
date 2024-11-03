@@ -76,13 +76,14 @@ export const BannerColumns = (
     header: 'Ações',
     id: 'actions',
     cell: ({ row }) => {
-      const productId = row.original.id
-      const productStatus: boolean = row.getValue('status')
+      const bannerId = row.original.id
+      const bannerStatus: boolean = row.getValue('status')
 
       return (
         <DropdownMenuTable
-          id={productId.toString()}
-          status={productStatus}
+          id={bannerId.toString()}
+          status={bannerStatus}
+          type="banner"
           fetchData={fetchData}
         />
       )
