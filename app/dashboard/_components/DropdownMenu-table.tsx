@@ -8,19 +8,34 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
 import { MoreHorizontal, ToggleRight, Pencil, Trash2 } from 'lucide-react'
-import { updateProductStatus } from '../_actions/actions'
+import { updateBannerStatus, updateProductStatus } from '../_actions/actions'
 import Link from 'next/link'
 
 interface IParams {
   id: string
   status: boolean
+  type: string
   fetchData: () => void
 }
 
-export default function DropdownMenuTable({ id, status, fetchData }: IParams) {
+export default function DropdownMenuTable({
+  id,
+  status,
+  type,
+  fetchData,
+}: IParams) {
   async function toggleProductStatus(id: string) {
     try {
       await updateProductStatus(id)
+      fetchData()
+    } catch (error) {
+      console.error('Error updating product status:', error)
+    }
+  }
+
+  async function toggleBannerStatus(id: string) {
+    try {
+      await updateBannerStatus(id)
       fetchData()
     } catch (error) {
       console.error('Error updating banner status:', error)
@@ -42,7 +57,11 @@ export default function DropdownMenuTable({ id, status, fetchData }: IParams) {
         <DropdownMenuItem className="flex items-center gap-2">
           <button
             className="flex items-center gap-2"
-            onClick={() => toggleProductStatus(id)}
+            onClick={() =>
+              type === 'product'
+                ? toggleProductStatus(id)
+                : toggleBannerStatus(id)
+            }
           >
             <ToggleRight size={20} />
             {status ? 'Desativar' : 'Ativar'}
@@ -50,7 +69,7 @@ export default function DropdownMenuTable({ id, status, fetchData }: IParams) {
         </DropdownMenuItem>
         <DropdownMenuItem className="flex items-center gap-2">
           <Link
-            href={`/dashboard/alt-product/${id}`}
+            href={`/dashboard/alt-${type}/${id}`}
             className="flex items-center gap-2"
           >
             <Pencil size={20} />
