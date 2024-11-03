@@ -43,7 +43,7 @@ export const BannerColumns = (
         variant="ghost"
         onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
       >
-        Nome do Produto
+        Nome do Banner
         <ArrowUpDown className="ml-2 h-4 w-4" />
       </Button>
     ),
