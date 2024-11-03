@@ -22,15 +22,15 @@ export async function deleteProduct(formData: FormData) {
   revalidatePath('/')
 }
 
-export async function updateBannerStatus(id: number) {
+export async function updateBannerStatus(id: string) {
   const banner = await db.banner.findUnique({
-    where: { id },
+    where: { id: Number(id) },
   })
 
   if (!banner) throw new Error(`The Id banner ${id} not found`)
 
   const updatedBanner = await db.banner.update({
-    where: { id },
+    where: { id: Number(id) },
     data: {
       status: !banner.status,
     },
