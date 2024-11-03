@@ -5,20 +5,6 @@ async function main() {
   await prisma.product.createMany({
     data: [
       {
-        id: 1,
-        name: 'Banner Promo',
-        description: 'Promotional banner with custom design.',
-        category: 'Promotions',
-        retailPrice: new Prisma.Decimal(15.99),
-        wholesalePrice: new Prisma.Decimal(10.99),
-        minQuantity: 10,
-        imageUrl:
-          'https://rpe3c59juxn54zf2.public.blob.vercel-storage.com/BannerPromo-xfTJs5Cf3s1rsyrWicKx87IlSX9qpr.png',
-        status: true,
-        CreatedAt: new Date(),
-      },
-      {
-        id: 2,
         name: 'Caixa Eu Te Amo',
         description: 'Gift box with a "I Love You" design.',
         category: 'Gift',
@@ -31,7 +17,6 @@ async function main() {
         CreatedAt: new Date(),
       },
       {
-        id: 3,
         name: 'Copo Stanley Rosa',
         description: 'Pink Stanley cup with high durability.',
         category: 'Drinkware',
@@ -44,7 +29,6 @@ async function main() {
         CreatedAt: new Date(),
       },
       {
-        id: 4,
         name: 'Placa de Pix Personalizada',
         description: 'Custom Pix plaque for easy payment display.',
         category: 'Customizable',
@@ -57,7 +41,6 @@ async function main() {
         CreatedAt: new Date(),
       },
       {
-        id: 5,
         name: 'Troféu',
         description: 'Customized trophy for events and awards.',
         category: 'Awards',
@@ -70,7 +53,6 @@ async function main() {
         CreatedAt: new Date(),
       },
       {
-        id: 6,
         name: 'Caixa Meus Lacinhos',
         description: 'Box for organizing bows and small items.',
         category: 'Organization',
@@ -83,7 +65,6 @@ async function main() {
         CreatedAt: new Date(),
       },
       {
-        id: 7,
         name: 'Chaveiro Personalizado',
         description: 'Custom keychain with unique designs.',
         category: 'Accessories',
@@ -96,7 +77,6 @@ async function main() {
         CreatedAt: new Date(),
       },
       {
-        id: 8,
         name: 'Gravação em Copo',
         description: 'Custom engraving on glass cups.',
         category: 'Customizable',
@@ -109,7 +89,6 @@ async function main() {
         CreatedAt: new Date(),
       },
       {
-        id: 9,
         name: 'Lembrancinha Feliz Dia das Mães',
         description: 'Mother’s Day souvenir with custom text.',
         category: 'Gifts',
@@ -122,7 +101,6 @@ async function main() {
         CreatedAt: new Date(),
       },
       {
-        id: 10,
         name: 'Lembrancinha São Cosme',
         description: 'Souvenir with a design celebrating Saint Cosme.',
         category: 'Religious',
