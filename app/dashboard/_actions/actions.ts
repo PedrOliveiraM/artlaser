@@ -2,6 +2,7 @@
 
 import { db } from '@/lib/prisma'
 import { Banner, Product } from '@prisma/client'
+import { del } from '@vercel/blob'
 
 type Response = {
   status: number
@@ -211,9 +212,13 @@ export async function deleteProduct(id: string): Promise<Response> {
       }
     }
 
+    const imageUrl = product.imageUrl
+
     const deletedProduct = await db.product.delete({
       where: { id: parsedId },
     })
+
+    del(imageUrl)
 
     return {
       status: 200,
@@ -253,9 +258,13 @@ export async function deleteBanner(id: string): Promise<Response> {
       }
     }
 
+    const bannerUrl = banner.imageUrl
+
     const deletedBanner = await db.banner.delete({
       where: { id: parsedId },
     })
+
+    del(bannerUrl)
 
     return {
       status: 200,
