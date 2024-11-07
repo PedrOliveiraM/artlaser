@@ -1,4 +1,5 @@
 'use client'
+import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -6,15 +7,17 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Button } from '@/components/ui/button'
-import { MoreHorizontal, ToggleRight, Pencil, Trash2 } from 'lucide-react'
+import { useToast } from '@/hooks/use-toast'
+import { MoreHorizontal, Pencil, ToggleRight, Trash2 } from 'lucide-react'
+import Link from 'next/link'
 import {
   deleteBanner,
   deleteProduct,
   updateBannerStatus,
   updateProductStatus,
 } from '../_actions/actions'
-import Link from 'next/link'
+import { useState } from 'react'
+import Loading from '@/components/loading'
 
 interface IParams {
   id: string
@@ -29,41 +32,96 @@ export default function DropdownMenuTable({
   type,
   fetchData,
 }: IParams) {
+  const { toast } = useToast()
+  const [loading, setLoading] = useState<boolean>(false)
+
   async function toggleProductStatus(id: string) {
     try {
+      setLoading(true)
       await updateProductStatus(id)
+      setLoading(false)
+      toast({
+        description: 'Produto alterado com sucesso!',
+        variant: 'success',
+      })
       fetchData()
     } catch (error) {
+      setLoading(false)
       console.error('Error updating product status:', error)
+      toast({
+        description: 'Erro ao alterar Produto!',
+        variant: 'destructive',
+      })
     }
   }
 
   async function toggleBannerStatus(id: string) {
     try {
+      setLoading(true)
       await updateBannerStatus(id)
+      setLoading(false)
+
+      toast({
+        description: 'Banner alterado com sucesso!',
+        variant: 'success',
+      })
+
       fetchData()
     } catch (error) {
       console.error('Error updating banner status:', error)
+      setLoading(false)
+      toast({
+        description: 'Erro ao alterar Banner!',
+        variant: 'destructive',
+      })
     }
   }
 
   async function removeProduct(id: string) {
     try {
+      setLoading(true)
       await deleteProduct(id)
+      setLoading(false)
+
+      toast({
+        description: 'Produto removido com sucesso!',
+        variant: 'success',
+      })
+
       fetchData()
     } catch (error) {
       console.error('Error updating banner status:', error)
+      setLoading(false)
+      toast({
+        description: 'O produto não foi removido!',
+        variant: 'success',
+      })
     }
   }
 
   async function removeBanner(id: string) {
     try {
+      setLoading(true)
       await deleteBanner(id)
+      setLoading(false)
+
+      toast({
+        description: 'Banner removido com sucesso!',
+        variant: 'success',
+      })
+
       fetchData()
     } catch (error) {
       console.error('Error updating banner status:', error)
+      setLoading(false)
+      toast({
+        description: 'O Banner não foi removido!',
+        variant: 'success',
+      })
     }
   }
+
+  if (loading) return <Loading />
 
   return (
     <DropdownMenu>
@@ -100,17 +158,15 @@ export default function DropdownMenuTable({
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem>
-          <form>
-            <button type="submit" className="flex items-center gap-2">
-              <Trash2
-                size={20}
-                onClick={() =>
-                  type === 'product' ? removeProduct(id) : removeBanner(id)
-                }
-              />
-              Remover
-            </button>
-          </form>
+          <button
+            className="flex items-center gap-2"
+            onClick={() =>
+              type === 'product' ? removeProduct(id) : removeBanner(id)
+            }
+          >
+            <Trash2 size={20} />
+            Remover
+          </button>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
