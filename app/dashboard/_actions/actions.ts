@@ -228,3 +228,45 @@ export async function deleteProduct(id: string): Promise<Response> {
     }
   }
 }
+
+export async function deleteBanner(id: string): Promise<Response> {
+  try {
+    const parsedId = parseInt(id, 10)
+
+    if (isNaN(parsedId)) {
+      return {
+        status: 400,
+        data: null,
+        message: `Invalid banner ID: ${id}`,
+      }
+    }
+
+    const banner = await db.banner.findUnique({
+      where: { id: parsedId },
+    })
+
+    if (!banner) {
+      return {
+        status: 404,
+        data: null,
+        message: `banner not found with ID: ${id}`,
+      }
+    }
+
+    const deletedBanner = await db.banner.delete({
+      where: { id: parsedId },
+    })
+
+    return {
+      status: 200,
+      data: deletedBanner,
+      message: 'banner deleted successfully',
+    }
+  } catch (error) {
+    return {
+      status: 500,
+      data: null,
+      message: 'An unexpected error occurred while deleting the banner.',
+    }
+  }
+}

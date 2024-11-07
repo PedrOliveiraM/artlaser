@@ -8,7 +8,12 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
 import { MoreHorizontal, ToggleRight, Pencil, Trash2 } from 'lucide-react'
-import { updateBannerStatus, updateProductStatus } from '../_actions/actions'
+import {
+  deleteBanner,
+  deleteProduct,
+  updateBannerStatus,
+  updateProductStatus,
+} from '../_actions/actions'
 import Link from 'next/link'
 
 interface IParams {
@@ -36,6 +41,24 @@ export default function DropdownMenuTable({
   async function toggleBannerStatus(id: string) {
     try {
       await updateBannerStatus(id)
+      fetchData()
+    } catch (error) {
+      console.error('Error updating banner status:', error)
+    }
+  }
+
+  async function removeProduct(id: string) {
+    try {
+      await deleteProduct(id)
+      fetchData()
+    } catch (error) {
+      console.error('Error updating banner status:', error)
+    }
+  }
+
+  async function removeBanner(id: string) {
+    try {
+      await deleteBanner(id)
       fetchData()
     } catch (error) {
       console.error('Error updating banner status:', error)
@@ -79,7 +102,12 @@ export default function DropdownMenuTable({
         <DropdownMenuItem>
           <form>
             <button type="submit" className="flex items-center gap-2">
-              <Trash2 size={20} />
+              <Trash2
+                size={20}
+                onClick={() =>
+                  type === 'product' ? removeProduct(id) : removeBanner(id)
+                }
+              />
               Remover
             </button>
           </form>
