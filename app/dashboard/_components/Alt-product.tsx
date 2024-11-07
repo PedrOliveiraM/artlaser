@@ -24,12 +24,12 @@ import { z } from 'zod'
 import formSchema from '../_schema/formSchema'
 
 interface IDefaultValues {
-  name: string
-  description: string
-  category: string
-  retailPrice: number
-  wholesalePrice: number
-  minQuantity: number
+  name: string | undefined
+  description: string | undefined
+  category: string | undefined
+  retailPrice: number | undefined
+  wholesalePrice: number | undefined
+  minQuantity: number | undefined
   status: 'ativo' | 'inativo'
 }
 

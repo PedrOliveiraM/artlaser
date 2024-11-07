@@ -4,9 +4,9 @@ import { db } from '@/lib/prisma'
 import { Banner, Product } from '@prisma/client'
 import { del } from '@vercel/blob'
 
-type Response = {
+type Response<Ttype> = {
   status: number
-  data: Product | null | Banner
+  data: Ttype | null
   message?: string
 }
 
@@ -22,7 +22,9 @@ interface IProductDto {
   status: boolean
 }
 
-export async function updateBannerStatus(id: string): Promise<Response> {
+export async function updateBannerStatus(
+  id: string,
+): Promise<Response<Banner>> {
   try {
     const parsedId = parseInt(id, 10)
 
@@ -67,7 +69,9 @@ export async function updateBannerStatus(id: string): Promise<Response> {
   }
 }
 
-export async function updateProductStatus(id: string): Promise<Response> {
+export async function updateProductStatus(
+  id: string,
+): Promise<Response<Product>> {
   try {
     const parsedId = parseInt(id, 10)
 
@@ -110,7 +114,7 @@ export async function updateProductStatus(id: string): Promise<Response> {
   }
 }
 
-export async function getProductById(id: string): Promise<Response> {
+export async function getProductById(id: string): Promise<Response<Product>> {
   try {
     const parsedId = parseInt(id, 10)
 
@@ -146,7 +150,9 @@ export async function getProductById(id: string): Promise<Response> {
   }
 }
 
-export async function updatedProduct(data: IProductDto): Promise<Response> {
+export async function updatedProduct(
+  data: IProductDto,
+): Promise<Response<Product>> {
   try {
     const {
       id,
@@ -188,7 +194,7 @@ export async function updatedProduct(data: IProductDto): Promise<Response> {
   }
 }
 
-export async function deleteProduct(id: string): Promise<Response> {
+export async function deleteProduct(id: string): Promise<Response<Product>> {
   try {
     const parsedId = parseInt(id, 10)
 
@@ -234,7 +240,7 @@ export async function deleteProduct(id: string): Promise<Response> {
   }
 }
 
-export async function deleteBanner(id: string): Promise<Response> {
+export async function deleteBanner(id: string): Promise<Response<Banner>> {
   try {
     const parsedId = parseInt(id, 10)
 
