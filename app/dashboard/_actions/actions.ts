@@ -1,7 +1,13 @@
 'use server'
 
 import { db } from '@/lib/prisma'
-import { revalidatePath } from 'next/cache'
+import { Banner, Product } from '@prisma/client'
+
+type Response = {
+  status: number
+  data: Product | null | Banner
+  message?: string
+}
 
 interface IProductDto {
   id: number
@@ -15,88 +21,134 @@ interface IProductDto {
   status: boolean
 }
 
-export async function deleteProduct(formData: FormData) {
-  const id = Number(formData.get('id'))
-  return id
-  // await deleteProductById(id)
-  revalidatePath('/')
-}
+export async function updateBannerStatus(id: string): Promise<Response> {
+  try {
+    const parsedId = parseInt(id, 10)
 
-export async function updateBannerStatus(id: string) {
-  const banner = await db.banner.findUnique({
-    where: { id: Number(id) },
-  })
+    if (isNaN(parsedId)) {
+      return {
+        status: 400,
+        data: null,
+        message: `Invalid Banner ID: ${id}`,
+      }
+    }
 
-  if (!banner) throw new Error(`The Id banner ${id} not found`)
+    const banner = await db.banner.findUnique({
+      where: { id: parsedId },
+    })
 
-  const updatedBanner = await db.banner.update({
-    where: { id: Number(id) },
-    data: {
-      status: !banner.status,
-    },
-  })
+    if (!banner) {
+      return {
+        status: 404,
+        data: null,
+        message: `Banner not found with ID: ${id}`,
+      }
+    }
 
-  return {
-    success: true,
-    message: 'Product status updated successfully',
-    data: updatedBanner,
+    const updatedBanner = await db.banner.update({
+      where: { id: parsedId },
+      data: {
+        status: !banner.status,
+      },
+    })
+
+    return {
+      status: 200,
+      data: updatedBanner,
+      message: 'Banner status updated successfully',
+    }
+  } catch (error) {
+    return {
+      status: 500,
+      data: null,
+      message: 'An unexpected error occurred while updating the banner status.',
+    }
   }
 }
-export async function updateProductStatus(id: string) {
-  try {
-    const product = await db.product.findUnique({ where: { id: Number(id) } })
 
-    if (!product) throw new Error(`The Id Product ${id} not found`)
+export async function updateProductStatus(id: string): Promise<Response> {
+  try {
+    const parsedId = parseInt(id, 10)
+
+    if (isNaN(parsedId)) {
+      return {
+        status: 400,
+        data: null,
+        message: `Invalid Product ID: ${id}`,
+      }
+    }
+
+    const product = await db.product.findUnique({ where: { id: parsedId } })
+
+    if (!product) {
+      return {
+        status: 404,
+        data: null,
+        message: `Product not found with ID: ${id}`,
+      }
+    }
 
     const updatedProduct = await db.product.update({
-      where: { id: Number(id) },
+      where: { id: parsedId },
       data: {
         status: !product.status,
       },
     })
 
     return {
-      success: true,
+      status: 200,
       message: 'Product status updated successfully',
       data: updatedProduct,
     }
   } catch (error) {
-    throw new Error(`Failed to update product status: ${error}`)
+    return {
+      status: 500,
+      data: null,
+      message: 'An unexpected error occurred while updating product status.',
+    }
   }
 }
 
-export async function getProductById(id: string) {
+export async function getProductById(id: string): Promise<Response> {
   try {
-    const product = await db.product.findUnique({ where: { id: Number(id) } })
+    const parsedId = parseInt(id, 10)
 
-    if (!product) throw new Error(`The Id Product ${id} not found`)
+    if (isNaN(parsedId)) {
+      return {
+        status: 400,
+        data: null,
+        message: `Invalid Product ID: ${id}`,
+      }
+    }
+
+    const product = await db.product.findUnique({ where: { id: parsedId } })
+
+    if (!product) {
+      return {
+        status: 404,
+        data: null,
+        message: `Product not found with ID: ${id}`,
+      }
+    }
 
     return {
-      success: true,
+      status: 200,
       message: 'Product found successfully',
       data: product,
     }
   } catch (error) {
-    throw new Error(`Failed to update product status: ${error}`)
+    return {
+      status: 500,
+      data: null,
+      message: 'An unexpected error occurred while getting product by id.',
+    }
   }
 }
 
-export async function updatedProduct(data: IProductDto) {
-  const {
-    id,
-    name,
-    description,
-    retailPrice,
-    wholesalePrice,
-    category,
-    minQuantity,
-    status,
-    imageUrl,
-  } = data
-
-  const productUpdated = await db.product.update({
-    where: { id },
-    data: {
+export async function updatedProduct(data: IProductDto): Promise<Response> {
+  try {
+    const {
+      id,
       name,
       description,
       retailPrice,
@@ -105,12 +157,74 @@ export async function updatedProduct(data: IProductDto) {
       minQuantity,
       status,
       imageUrl,
-    },
-  })
+    } = data
 
-  return {
-    success: true,
-    message: 'Product updated successfully',
-    data: productUpdated,
+    const productUpdated = await db.product.update({
+      where: { id },
+      data: {
+        name,
+        description,
+        retailPrice,
+        wholesalePrice,
+        category,
+        minQuantity,
+        status,
+        imageUrl,
+      },
+    })
+
+    return {
+      status: 200,
+      message: 'Product updated successfully',
+      data: productUpdated,
+    }
+  } catch (error) {
+    return {
+      status: 500,
+      data: null,
+      message: 'An unexpected error occurred while updating the product.',
+    }
+  }
+}
+
+export async function deleteProduct(id: string): Promise<Response> {
+  try {
+    const parsedId = parseInt(id, 10)
+
+    if (isNaN(parsedId)) {
+      return {
+        status: 400,
+        data: null,
+        message: `Invalid product ID: ${id}`,
+      }
+    }
+
+    const product = await db.product.findUnique({
+      where: { id: parsedId },
+    })
+
+    if (!product) {
+      return {
+        status: 404,
+        data: null,
+        message: `Product not found with ID: ${id}`,
+      }
+    }
+
+    const deletedProduct = await db.product.delete({
+      where: { id: parsedId },
+    })
+
+    return {
+      status: 200,
+      data: deletedProduct,
+      message: 'Product deleted successfully',
+    }
+  } catch (error) {
+    return {
+      status: 500,
+      data: null,
+      message: 'An unexpected error occurred while deleting the product.',
+    }
   }
 }
