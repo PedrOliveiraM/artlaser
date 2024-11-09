@@ -22,6 +22,12 @@ import Cropper, { ReactCropperElement } from 'react-cropper'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import formSchema from '../_schema/formSchema'
+import { PutBlobResult } from '@vercel/blob'
+import {
+  deleteImageFromBlob,
+  uploadImageToBlob,
+} from '@/functions/blobFunctions'
+import { useRouter } from 'next/navigation'
 
 interface IDefaultValues {
   name: string | undefined
@@ -31,6 +37,7 @@ interface IDefaultValues {
   wholesalePrice: number | undefined
   minQuantity: number | undefined
   status: 'ativo' | 'inativo'
+  imageUrl?: string | undefined
 }
 
 interface IProductDto {
@@ -38,18 +45,18 @@ interface IProductDto {
 }
 
 export default function ProductChangeForm({ defaultValues }: IProductDto) {
-  const [productData, setProductData] = useState<IProductDto>({
-    defaultValues,
-  })
+  // const [productData, setProductData] = useState<IProductDto>({
+  //   defaultValues,
+  // })
   const inputFileRef = useRef<HTMLInputElement>(null)
   const cropperRef = useRef<ReactCropperElement>(null)
-  //   const [blobResult, setBlobResult] = useState<PutBlobResult | null>(null)
+  const [blobResult, setBlobResult] = useState<PutBlobResult | null>(null)
   const [imageUrl, setImageUrl] = useState<string | null>(null)
 
   const [uploading, setUploading] = useState<boolean>(false)
   const { toast } = useToast()
+  const router = useRouter()
 
-  console.log('Default :', defaultValues)
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues,
@@ -68,111 +75,71 @@ export default function ProductChangeForm({ defaultValues }: IProductDto) {
     }
   }
 
-  //   const uploadImageToBlob = async (
-  //     filename: string,
-  //   ): Promise<PutBlobResult | null> => {
-  //     try {
-  //       const cropper = cropperRef.current?.cropper
-  //       if (!cropper) {
-  //         throw new Error('Cropper not found')
-  //       }
+  const updateProduct = async (
+    productData: IProductDto,
+  ): Promise<IProductDto | undefined> => {
+    try {
+      const response = await fetch('/api/products', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(productData),
+      })
 
-  //       // Convert the cropped image to Blob
-  //       return new Promise((resolve, reject) => {
-  //         cropper.getCroppedCanvas().toBlob(async (blob) => {
-  //           if (!blob) {
-  //             reject(new Error('Failed to create Blob from cropped image'))
-  //             return
-  //           }
+      if (!response.ok) {
+        throw new Error('Erro ao atualizar produto')
+      }
 
-  //           const file = new File([blob], `${filename}-${Date.now()}.png`, {
-  //             type: 'image/png',
-  //           })
+      const result: { updatedProduct: IProductDto } = await response.json() // Tipando o resultado esperado
 
-  //           // Upload the cropped image to Vercel Blob
-  //           const response = await fetch(
-  //             `/api/blob/upload?filename=${file.name}`,
-  //             {
-  //               method: 'POST',
-  //               body: file,
-  //             },
-  //           )
-
-  //           if (!response.ok) {
-  //             reject(new Error('Failed to upload image'))
-  //             return
-  //           }
-
-  //           const newBlob = (await response.json()) as PutBlobResult
-  //           setBlobResult(newBlob)
-  //           resolve(newBlob) // Retorna o novo blob para o chamador
-  //         }, 'image/png')
-  //       })
-  //     } catch (error) {
-  //       console.error(`Error uploading image: ${blobResult}`, error)
-  //       toast({
-  //         title: 'Erro',
-  //         description: 'Não foi possível salvar a imagem! Tente Novamente.',
-  //         variant: 'destructive',
-  //       })
-  //       return null
-  //     }
-  //   }
-
-  //   const deleteImageFromBlob = async (
-  //     url: string | undefined,
-  //   ): Promise<boolean> => {
-  //     try {
-  //       const response = await fetch(`/api/blob/upload?url=${url}`, {
-  //         method: 'DELETE',
-  //       })
-
-  //       if (!response.ok) {
-  //         throw new Error(`Failed to delete image: ${response.statusText}`)
-  //       }
-
-  //       return true // Indicate success
-  //     } catch (error) {
-  //       console.error('Error deleting image:', error)
-  //       return false
-  //     }
-  //   }
-
-  //   const createProduct = async (
-  //     productData: IProductDto,
-  //   ): Promise<IProductDto | undefined> => {
-  //     try {
-  //       const response = await fetch('/api/products', {
-  //         method: 'POST',
-  //         headers: {
-  //           'Content-Type': 'application/json',
-  //         },
-  //         body: JSON.stringify(productData),
-  //       })
-
-  //       if (!response.ok) {
-  //         throw new Error('Erro ao criar o produto')
-  //       }
-
-  //       const result: { createdProduct: IProductDto } = await response.json() // Tipando o resultado esperado
-
-  //       return result.createdProduct
-  //     } catch (error) {
-  //       console.error('Erro:', error)
-  //       return undefined
-  //     }
-  //   }
+      return result.updatedProduct
+    } catch (error) {
+      console.error('Erro:', error)
+      return undefined
+    }
+  }
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       console.log(values)
-      setProductData(productData)
+      console.log('VALOR Image: ', cropperRef.current?.cropper)
+
+      if (cropperRef.current?.cropper) {
+        // significa que o usuario mandou um arquivo novo
+        //  Tenho que pegar a url
+        const imageUrl = defaultValues.imageUrl
+        //  remover a iamgem do blob
+        const response = await deleteImageFromBlob(imageUrl)
+
+        if (!response)
+          throw new Error(
+            'Erro ao deletar imagem para alterar ela para uma nova',
+          )
+        // adicionar a nova imagems
+
+        const newBlob = await uploadImageToBlob(values.name, cropperRef)
+        setBlobResult(newBlob)
+      }
+
+      const newImageUrl = blobResult?.url
+
+      const newProductData: IProductDto = {
+        defaultValues: values,
+      }
+
+      newProductData.defaultValues.imageUrl = newImageUrl
+
+      updateProduct(newProductData)
+      // setProductData(newProductData)
       setUploading(false)
       toast({
         title: 'Salvo com sucesso',
         description: 'Produto criado com sucesso!',
         variant: 'success',
       })
+
+      router.push('/dashboard')
     } catch (error) {
       setUploading(false)
       console.error('Error submitting form:', error)
@@ -203,7 +170,6 @@ export default function ProductChangeForm({ defaultValues }: IProductDto) {
                 onChange={handleFileChange}
                 className="mb-4 block w-full text-sm text-gray-500 file:mr-4 file:rounded-full file:border-0 file:bg-indigo-100 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-indigo-700 hover:file:bg-indigo-200"
                 ref={inputFileRef}
-                required
               />
 
               {imageUrl && ( // Verifica se imageUrl não é nulo

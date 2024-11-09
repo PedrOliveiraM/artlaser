@@ -27,3 +27,6 @@ export async function POST(request: Request) {
     )
   }
 } // Adjust the import path to your actual db setup
+
+// todo Create method PUT
+// export async function PUT(request: Request) {}
