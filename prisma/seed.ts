@@ -12,7 +12,7 @@ async function main() {
         wholesalePrice: new Prisma.Decimal(13.99),
         minQuantity: 5,
         imageUrl:
-          'https://rpe3c59juxn54zf2.public.blob.vercel-storage.com/Caixa eu te amo-1730479989702-307Y7RWu3ET3IoveI9NUTdF7VsGrou.png',
+          'https://rpe3c59juxn54zf2.public.blob.vercel-storage.com/caixa%20eu%20te%20amo-zPWG7EVNyAIGlL0otCwrvdjV9gOElY.png',
         status: true,
         CreatedAt: new Date(),
       },
@@ -24,7 +24,7 @@ async function main() {
         wholesalePrice: new Prisma.Decimal(24.99),
         minQuantity: 5,
         imageUrl:
-          'https://rpe3c59juxn54zf2.public.blob.vercel-storage.com/Copo stanely rosa-1729636033892-6MGcPwe1k8nOzZWueqnkTZWrmtPw0R.png',
+          'https://rpe3c59juxn54zf2.public.blob.vercel-storage.com/CopoStanley-85rMlNRh1cfMbkJW8PeDx4t7y4Ue4O.png',
         status: true,
         CreatedAt: new Date(),
       },
@@ -36,7 +36,7 @@ async function main() {
         wholesalePrice: new Prisma.Decimal(12.99),
         minQuantity: 10,
         imageUrl:
-          'https://rpe3c59juxn54zf2.public.blob.vercel-storage.com/Placa de Pix Personalizada-1730480013089-N14FgGH3JiLzwV2qrZDvexSW9v3ufo.png',
+          'https://rpe3c59juxn54zf2.public.blob.vercel-storage.com/plaquinha%20de%20pix-2AvU6cnwLH1d8UYJRDCf99CZIJ4RwF.png',
         status: true,
         CreatedAt: new Date(),
       },
@@ -48,7 +48,7 @@ async function main() {
         wholesalePrice: new Prisma.Decimal(17.99),
         minQuantity: 3,
         imageUrl:
-          'https://rpe3c59juxn54zf2.public.blob.vercel-storage.com/Trofeu-FR90lDYMV7ZcmsYfFafYD1nY1WRe4g.png',
+          'https://rpe3c59juxn54zf2.public.blob.vercel-storage.com/Trofeu-kh0Mgkp9Go2Nt02PYFDqsA7TnwEz7L.png',
         status: true,
         CreatedAt: new Date(),
       },
@@ -60,7 +60,7 @@ async function main() {
         wholesalePrice: new Prisma.Decimal(10.49),
         minQuantity: 10,
         imageUrl:
-          'https://rpe3c59juxn54zf2.public.blob.vercel-storage.com/caixa meus lacinhos-XxYF7RqnSh2QvrNsucl1XOlBWDrBh5.png',
+          'https://rpe3c59juxn54zf2.public.blob.vercel-storage.com/caixa%20meus%20lacinhos-xwNg6c48JznU4L6xu7JGDUdRdmr5lO.png',
         status: true,
         CreatedAt: new Date(),
       },
@@ -72,19 +72,19 @@ async function main() {
         wholesalePrice: new Prisma.Decimal(5.99),
         minQuantity: 15,
         imageUrl:
-          'https://rpe3c59juxn54zf2.public.blob.vercel-storage.com/chaveiro-BoJ4ZSwpg7KBITIodM1CZdPq36K1qy.png',
+          'https://rpe3c59juxn54zf2.public.blob.vercel-storage.com/chaveiro-oonmvh8zbEHws4JB0UISc31Zj8lLq3.png',
         status: true,
         CreatedAt: new Date(),
       },
       {
-        name: 'Gravação em Copo',
-        description: 'Custom engraving on glass cups.',
-        category: 'Customizable',
-        retailPrice: new Prisma.Decimal(12.99),
-        wholesalePrice: new Prisma.Decimal(8.99),
-        minQuantity: 8,
+        name: 'Chaveiro Personalizado De Almofada',
+        description: 'Custom keychain with unique designs.',
+        category: 'Accessories',
+        retailPrice: new Prisma.Decimal(8.99),
+        wholesalePrice: new Prisma.Decimal(5.99),
+        minQuantity: 15,
         imageUrl:
-          'https://rpe3c59juxn54zf2.public.blob.vercel-storage.com/gravação em copo-tf4MtyAboaRiD3C2vyERP8gnuR8vtz.png',
+          'https://rpe3c59juxn54zf2.public.blob.vercel-storage.com/chaveiros%20amofada-urEMfHEOemlkdX9VXBYqVKUlzT38QB.png',
         status: true,
         CreatedAt: new Date(),
       },
@@ -96,7 +96,7 @@ async function main() {
         wholesalePrice: new Prisma.Decimal(3.99),
         minQuantity: 20,
         imageUrl:
-          'https://rpe3c59juxn54zf2.public.blob.vercel-storage.com/lemb feliz dia das maes-tAkqayXx4Rl5QGBdonmr5sifT1zguM.png',
+          'https://rpe3c59juxn54zf2.public.blob.vercel-storage.com/lemb%20feliz%20dia%20das%20maes-4u12hxqyWN1MPmOblnkQMWrUrpAM4t.png',
         status: true,
         CreatedAt: new Date(),
       },
@@ -108,7 +108,7 @@ async function main() {
         wholesalePrice: new Prisma.Decimal(4.99),
         minQuantity: 15,
         imageUrl:
-          'https://rpe3c59juxn54zf2.public.blob.vercel-storage.com/lembSaoCosmo-IOv9VPHbqlvLhufswlhHqpP2Ehc42O.png',
+          'https://rpe3c59juxn54zf2.public.blob.vercel-storage.com/lembSaoCosmo-T6TQtrkw6hKDAXlAfzx9VvWJbvXWGR.png',
         status: true,
         CreatedAt: new Date(),
       },
