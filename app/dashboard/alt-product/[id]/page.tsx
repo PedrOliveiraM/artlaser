@@ -7,6 +7,7 @@ interface IParams {
 }
 
 interface IDefaultValues {
+  id: number | undefined
   name: string | undefined
   description: string | undefined
   category: string | undefined
@@ -23,6 +24,7 @@ export default async function Page({ params: { id } }: { params: IParams }) {
   if (!product) return <Loading />
 
   const defaultValues: IDefaultValues = {
+    id: product.data?.id,
     name: product.data?.name,
     description: product.data?.description,
     category: product.data?.category,
