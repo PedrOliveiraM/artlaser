@@ -26,7 +26,4 @@ export async function POST(request: Request) {
       { status: 500 },
     )
   }
-} // Adjust the import path to your actual db setup
-
-// todo Create method PUT
-// export async function PUT(request: Request) {}
+}
