@@ -30,6 +30,7 @@ import {
 import { useRouter } from 'next/navigation'
 
 interface IDefaultValues {
+  id: number | undefined
   name: string | undefined
   description: string | undefined
   category: string | undefined
@@ -38,6 +39,18 @@ interface IDefaultValues {
   minQuantity: number | undefined
   status: 'ativo' | 'inativo'
   imageUrl?: string | undefined
+}
+
+interface IProductUpdateDto {
+  id: number | undefined
+  name: string
+  description: string
+  category: string
+  retailPrice: number
+  wholesalePrice: number
+  minQuantity: number
+  status: 'ativo' | 'inativo'
+  imageUrl?: string
 }
 
 interface IProductDto {
@@ -76,10 +89,10 @@ export default function ProductChangeForm({ defaultValues }: IProductDto) {
   }
 
   const updateProduct = async (
-    productData: IProductDto,
+    productData: IProductUpdateDto,
   ): Promise<IProductDto | undefined> => {
     try {
-      const response = await fetch('/api/products', {
+      const response = await fetch(`/api/products/${defaultValues.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -102,8 +115,17 @@ export default function ProductChangeForm({ defaultValues }: IProductDto) {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      console.log(values)
-      console.log('VALOR Image: ', cropperRef.current?.cropper)
+      const {
+        name,
+        description,
+        retailPrice,
+        wholesalePrice,
+        minQuantity,
+        category,
+        status,
+      } = values
+
+      const id = defaultValues.id
 
       if (cropperRef.current?.cropper) {
         // significa que o usuario mandou um arquivo novo
@@ -124,14 +146,20 @@ export default function ProductChangeForm({ defaultValues }: IProductDto) {
 
       const newImageUrl = blobResult?.url
 
-      const newProductData: IProductDto = {
-        defaultValues: values,
+      const newProductData: IProductUpdateDto = {
+        id,
+        name,
+        description,
+        retailPrice,
+        wholesalePrice,
+        minQuantity,
+        category,
+        status,
+        imageUrl: newImageUrl,
       }
 
-      newProductData.defaultValues.imageUrl = newImageUrl
-
       updateProduct(newProductData)
-      // setProductData(newProductData)
+
       setUploading(false)
       toast({
         title: 'Salvo com sucesso',
@@ -139,7 +167,9 @@ export default function ProductChangeForm({ defaultValues }: IProductDto) {
         variant: 'success',
       })
 
-      router.push('/dashboard')
+      setTimeout(() => {
+        router.push('/dashboard')
+      }, 2000)
     } catch (error) {
       setUploading(false)
       console.error('Error submitting form:', error)
@@ -162,7 +192,7 @@ export default function ProductChangeForm({ defaultValues }: IProductDto) {
               className="space-y-4 p-5"
             >
               <h1 className="text-center text-2xl font-bold">
-                Cadastrar Produto
+                Alterar Produto
               </h1>
               <input
                 type="file"
