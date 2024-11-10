@@ -1,6 +1,18 @@
 import { db } from '@/lib/prisma'
 import { NextRequest, NextResponse } from 'next/server'
 
+interface IProductUpdateDto {
+  id: number | undefined
+  name: string
+  description: string
+  category: string
+  retailPrice: number
+  wholesalePrice: number
+  minQuantity: number
+  status: 'ativo' | 'inativo'
+  imageUrl?: string
+}
+
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } },
@@ -32,28 +44,35 @@ export async function GET(
     )
   }
 }
-
-export async function PUT(request: Request) {
+export async function PUT(
+  request: Request,
+  { params }: { params: { id: string } },
+) {
   try {
-    const body = await request.json()
-    console.log('DATA RECEIVED BY PUT:', body)
+    const { id } = params
+    const body: IProductUpdateDto = await request.json()
 
-    // Assuming you have the product ID and fields to update in the body
-    const { id, ...updateData } = body
-
-    // Update the product in the database
     const updatedProduct = await db.product.update({
-      where: { id }, // Ensure that the product ID is passed correctly
-      data: updateData, // The fields to update
+      where: { id: parseInt(id) },
+      data: {
+        name: body.name,
+        description: body.description,
+        category: body.category,
+        retailPrice: body.retailPrice,
+        wholesalePrice: body.wholesalePrice,
+        minQuantity: body.minQuantity,
+        status: body.status === 'ativo',
+        imageUrl: body.imageUrl,
+      },
     })
 
-    if (!updatedProduct) throw new Error('Error updating product!')
+    if (!updatedProduct) throw new Error('Erro ao atualizar o produto!')
 
     return NextResponse.json({ updatedProduct }, { status: 200 })
   } catch (error) {
-    console.error('Error processing request:', error)
+    console.error('Erro ao processar a requisição:', error)
     return NextResponse.json(
-      { message: 'Internal Server Error' },
+      { message: 'Erro Interno do Servidor' },
       { status: 500 },
     )
   }
