@@ -58,9 +58,6 @@ interface IProductDto {
 }
 
 export default function ProductChangeForm({ defaultValues }: IProductDto) {
-  // const [productData, setProductData] = useState<IProductDto>({
-  //   defaultValues,
-  // })
   const inputFileRef = useRef<HTMLInputElement>(null)
   const cropperRef = useRef<ReactCropperElement>(null)
   const [blobResult, setBlobResult] = useState<PutBlobResult | null>(null)
@@ -115,6 +112,7 @@ export default function ProductChangeForm({ defaultValues }: IProductDto) {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
+      setUploading(true)
       const {
         name,
         description,
@@ -126,25 +124,21 @@ export default function ProductChangeForm({ defaultValues }: IProductDto) {
       } = values
 
       const id = defaultValues.id
+      let imageUrl = defaultValues.imageUrl
 
+      // Caso o cropper tenha uma nova imagem, realiza o upload e atualiza a URL da imagem
       if (cropperRef.current?.cropper) {
-        // significa que o usuario mandou um arquivo novo
-        //  Tenho que pegar a url
-        const imageUrl = defaultValues.imageUrl
-        //  remover a iamgem do blob
-        const response = await deleteImageFromBlob(imageUrl)
-
-        if (!response)
-          throw new Error(
-            'Erro ao deletar imagem para alterar ela para uma nova',
-          )
-        // adicionar a nova imagems
+        if (imageUrl) {
+          const deleteResponse = await deleteImageFromBlob(imageUrl)
+          if (!deleteResponse) throw new Error('Erro ao deletar imagem antiga.')
+        }
 
         const newBlob = await uploadImageToBlob(values.name, cropperRef)
+        if (!newBlob?.url) throw new Error('Erro ao salvar nova imagem.')
+
+        imageUrl = newBlob.url
         setBlobResult(newBlob)
       }
-
-      const newImageUrl = blobResult?.url
 
       const newProductData: IProductUpdateDto = {
         id,
@@ -155,29 +149,26 @@ export default function ProductChangeForm({ defaultValues }: IProductDto) {
         minQuantity,
         category,
         status,
-        imageUrl: newImageUrl,
+        imageUrl,
       }
 
-      updateProduct(newProductData)
+      await updateProduct(newProductData)
 
-      setUploading(false)
       toast({
-        title: 'Salvo com sucesso',
-        description: 'Produto criado com sucesso!',
+        title: 'Produto atualizado com sucesso!',
         variant: 'success',
       })
-
-      setTimeout(() => {
-        router.push('/dashboard')
-      }, 2000)
     } catch (error) {
-      setUploading(false)
-      console.error('Error submitting form:', error)
+      console.error('Erro ao enviar formulário:', error)
       toast({
         title: 'Erro',
-        description: 'Não foi possível salvar o produto! Tente Novamente.',
+        description: 'Não foi possível salvar o produto! Tente novamente.',
         variant: 'destructive',
       })
+      if (blobResult?.url) await deleteImageFromBlob(blobResult.url) // Deleta a nova imagem em caso de erro
+    } finally {
+      setUploading(false)
+      router.push('/dashboard')
     }
   }
 
