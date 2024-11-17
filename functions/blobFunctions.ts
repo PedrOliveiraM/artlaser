@@ -5,7 +5,7 @@ import { ReactCropperElement } from 'react-cropper'
 
 export const uploadImageToBlob = async (
   filename: string,
-  cropperRef: RefObject<ReactCropperElement>,
+  cropperRef: RefObject<ReactCropperElement>
 ): Promise<PutBlobResult | null> => {
   try {
     const cropper = cropperRef.current?.cropper
@@ -15,7 +15,7 @@ export const uploadImageToBlob = async (
 
     // Convert the cropped image to Blob
     return new Promise((resolve, reject) => {
-      cropper.getCroppedCanvas().toBlob(async (blob) => {
+      cropper.getCroppedCanvas().toBlob(async blob => {
         if (!blob) {
           reject(new Error('Failed to create Blob from cropped image'))
           return
@@ -51,9 +51,7 @@ export const uploadImageToBlob = async (
   }
 }
 
-export const deleteImageFromBlob = async (
-  url: string | undefined,
-): Promise<boolean> => {
+export const deleteImageFromBlob = async (url: string | undefined): Promise<boolean> => {
   try {
     const response = await fetch(`/api/blob/upload?url=${url}`, {
       method: 'DELETE',
@@ -67,5 +65,41 @@ export const deleteImageFromBlob = async (
   } catch (error) {
     console.error('Error deleting image:', error)
     return false
+  }
+}
+
+export const uploadFileImageToBlob = async (
+  filename: string,
+  file: File | null
+): Promise<PutBlobResult | null> => {
+  if (!file) {
+    toast({
+      title: 'Erro',
+      description: 'O arquivo pode não ter sido enviado ou está corrompido.',
+      variant: 'destructive',
+    })
+    return null
+  }
+
+  try {
+    const response = await fetch(`/api/blob/upload?filename=${file.name}`, {
+      method: 'POST',
+      body: file,
+    })
+
+    if (!response.ok) {
+      throw new Error('Failed to upload image')
+    }
+
+    const newBlob = (await response.json()) as PutBlobResult
+    return newBlob
+  } catch (error) {
+    console.error(`Error uploading image: ${filename}`, error)
+    toast({
+      title: 'Erro',
+      description: 'Não foi possível salvar a imagem! Tente novamente.',
+      variant: 'destructive',
+    })
+    return null
   }
 }
