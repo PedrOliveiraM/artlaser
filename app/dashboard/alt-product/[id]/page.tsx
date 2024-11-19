@@ -1,5 +1,5 @@
 import ProductChangeForm from '../../_components/Alt-product'
-import { getProductById } from '../../_actions/actions'
+import { getProductById } from '../../_actions/product/actions'
 import Loading from '@/components/loading'
 
 interface IParams {
