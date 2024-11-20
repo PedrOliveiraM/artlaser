@@ -1,6 +1,7 @@
 'use client'
 import { Banner, Product } from '@prisma/client'
 import { useEffect, useState } from 'react'
+import { useCallback } from 'react'
 import Loading from '@/components/loading'
 import { useToast } from '@/hooks/use-toast'
 import { DataTable } from './_components/DataTable'
@@ -8,6 +9,7 @@ import { Productcolumns } from './_components/Product-columns'
 import { BannerColumns } from './_components/Banner-Columns'
 import DashboardLayout from './dashboardLayout'
 import FieldSet from './_components/FieldSet'
+import { ApiResponse } from '@/utils/ApiResponse'
 
 export default function Home() {
   const [dataProducts, setDataProducts] = useState<Product[]>([])
@@ -15,7 +17,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true)
   const { toast } = useToast()
 
-  const fetchDataProducts = async () => {
+  const fetchDataProducts = useCallback(async () => {
     try {
       setLoading(true)
       const response = await fetch('/api/products')
@@ -30,17 +32,19 @@ export default function Home() {
     } catch (error) {
       toast({
         variant: 'destructive',
-        title: 'Uh oh! Something went wrong.',
-        description: 'There was a problem with your request.',
+        title: 'Erro',
+        description: 'Falha ao carregar os produtos.',
       })
     }
-  }
-  const fetchDataBanners = async () => {
+  }, [toast])
+
+  const fetchDataBanners = useCallback(async () => {
     try {
       setLoading(true)
       const response = await fetch('/api/banners')
-      const result = await response.json()
-      setDataBanners(result)
+      const result: ApiResponse<Banner[]> = await response.json()
+      if (!result.data) throw new Error('Falha ao carregar os banners')
+      setDataBanners(result.data)
       setLoading(false)
       toast({
         variant: 'success',
@@ -50,16 +54,16 @@ export default function Home() {
     } catch (error) {
       toast({
         variant: 'destructive',
-        title: 'Uh oh! Something went wrong.',
-        description: 'There was a problem with your request.',
+        title: 'Erro',
+        description: 'Falha ao carregar os banners.',
       })
     }
-  }
+  }, [toast])
 
   useEffect(() => {
     fetchDataProducts()
     fetchDataBanners()
-  }, [])
+  }, [fetchDataProducts, fetchDataBanners])
 
   if (loading) return <Loading />
   return (
