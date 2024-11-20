@@ -10,12 +10,8 @@ import {
 import { useToast } from '@/hooks/use-toast'
 import { MoreHorizontal, Pencil, ToggleRight, Trash2 } from 'lucide-react'
 import Link from 'next/link'
-import {
-  deleteBanner,
-  deleteProduct,
-  updateBannerStatus,
-  updateProductStatus,
-} from '../_actions/actions'
+import { deleteBanner, updateBannerStatus } from '../_actions/banner/actions'
+import { deleteProduct, updateProductStatus } from '../_actions/product/actions'
 import { useState } from 'react'
 import Loading from '@/components/loading'
 
@@ -26,12 +22,7 @@ interface IParams {
   fetchData: () => void
 }
 
-export default function DropdownMenuTable({
-  id,
-  status,
-  type,
-  fetchData,
-}: IParams) {
+export default function DropdownMenuTable({ id, status, type, fetchData }: IParams) {
   const { toast } = useToast()
   const [loading, setLoading] = useState<boolean>(false)
 
@@ -132,16 +123,13 @@ export default function DropdownMenuTable({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuLabel className="border-b-2 border-solid">
-          Ações
-        </DropdownMenuLabel>
+        <DropdownMenuLabel className="border-b-2 border-solid">Ações</DropdownMenuLabel>
         <DropdownMenuItem className="flex items-center gap-2">
           <button
+            type="button"
             className="flex items-center gap-2"
             onClick={() =>
-              type === 'product'
-                ? toggleProductStatus(id)
-                : toggleBannerStatus(id)
+              type === 'product' ? toggleProductStatus(id) : toggleBannerStatus(id)
             }
           >
             <ToggleRight size={20} />
@@ -149,20 +137,16 @@ export default function DropdownMenuTable({
           </button>
         </DropdownMenuItem>
         <DropdownMenuItem className="flex items-center gap-2">
-          <Link
-            href={`/dashboard/alt-${type}/${id}`}
-            className="flex items-center gap-2"
-          >
+          <Link href={`/dashboard/alt-${type}/${id}`} className="flex items-center gap-2">
             <Pencil size={20} />
             Editar
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem>
           <button
+            type="button"
             className="flex items-center gap-2"
-            onClick={() =>
-              type === 'product' ? removeProduct(id) : removeBanner(id)
-            }
+            onClick={() => (type === 'product' ? removeProduct(id) : removeBanner(id))}
           >
             <Trash2 size={20} />
             Remover
