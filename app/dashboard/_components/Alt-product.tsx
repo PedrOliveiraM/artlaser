@@ -12,22 +12,19 @@ import {
 import { Input } from '@/components/ui/input'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Textarea } from '@/components/ui/textarea'
+import { deleteImageFromBlob, uploadImageToBlob } from '@/functions/blobFunctions'
 import { useToast } from '@/hooks/use-toast'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { PutBlobResult } from '@vercel/blob'
 import 'cropperjs/dist/cropper.css'
 import { Check, Undo2 } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { ChangeEvent, useRef, useState } from 'react'
 import Cropper, { ReactCropperElement } from 'react-cropper'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import formSchema from '../_schema/formSchema'
-import { PutBlobResult } from '@vercel/blob'
-import {
-  deleteImageFromBlob,
-  uploadImageToBlob,
-} from '@/functions/blobFunctions'
-import { useRouter } from 'next/navigation'
+import { formProductSchema } from '../_schema/formSchema'
 
 interface IDefaultValues {
   id: number | undefined
@@ -67,8 +64,8 @@ export default function ProductChangeForm({ defaultValues }: IProductDto) {
   const { toast } = useToast()
   const router = useRouter()
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof formProductSchema>>({
+    resolver: zodResolver(formProductSchema),
     defaultValues,
   })
 
@@ -86,7 +83,7 @@ export default function ProductChangeForm({ defaultValues }: IProductDto) {
   }
 
   const updateProduct = async (
-    productData: IProductUpdateDto,
+    productData: IProductUpdateDto
   ): Promise<IProductDto | undefined> => {
     try {
       const response = await fetch(`/api/products/${defaultValues.id}`, {
@@ -110,7 +107,7 @@ export default function ProductChangeForm({ defaultValues }: IProductDto) {
     }
   }
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formProductSchema>) {
     try {
       setUploading(true)
       const {
@@ -178,13 +175,8 @@ export default function ProductChangeForm({ defaultValues }: IProductDto) {
       <div className="flex min-h-screen flex-col items-center justify-center bg-gray-100 p-4">
         <div className="w-full max-w-lg rounded-lg bg-white p-6 shadow-md">
           <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(onSubmit)}
-              className="space-y-4 p-5"
-            >
-              <h1 className="text-center text-2xl font-bold">
-                Alterar Produto
-              </h1>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 p-5">
+              <h1 className="text-center text-2xl font-bold">Alterar Produto</h1>
               <input
                 type="file"
                 accept="image/*"
@@ -223,10 +215,7 @@ export default function ProductChangeForm({ defaultValues }: IProductDto) {
                   <FormItem>
                     <FormLabel>Produto</FormLabel>
                     <FormControl>
-                      <Input
-                        placeholder="Informe o nome do produto"
-                        {...field}
-                      />
+                      <Input placeholder="Informe o nome do produto" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -258,10 +247,7 @@ export default function ProductChangeForm({ defaultValues }: IProductDto) {
                   <FormItem>
                     <FormLabel>Categoria</FormLabel>
                     <FormControl>
-                      <Input
-                        placeholder="Informe a categoria do produto"
-                        {...field}
-                      />
+                      <Input placeholder="Informe a categoria do produto" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -352,11 +338,7 @@ export default function ProductChangeForm({ defaultValues }: IProductDto) {
                 )}
               />
               <div className="flex justify-between">
-                <Button
-                  type="button"
-                  variant={'alert'}
-                  className="flex items-center"
-                >
+                <Button type="button" variant={'alert'} className="flex items-center">
                   <Undo2 size={20} />
                   <Link href={'/dashboard'}>Voltar</Link>
                 </Button>

@@ -20,11 +20,11 @@ import { ChangeEvent, useRef, useState } from 'react'
 import Cropper, { ReactCropperElement } from 'react-cropper'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import formSchema from '../_schema/formSchema'
 import capitalizeWords from '@/functions/capitalizeWords'
 import Link from 'next/link'
 import { Check, Undo2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { formProductSchema } from '../_schema/formSchema'
 
 interface IProductDto {
   name: string
@@ -47,8 +47,8 @@ export default function AddProduct() {
   const { toast } = useToast()
   const router = useRouter()
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof formProductSchema>>({
+    resolver: zodResolver(formProductSchema),
     defaultValues: {
       name: '',
       description: '',
@@ -73,9 +73,7 @@ export default function AddProduct() {
     }
   }
 
-  const uploadImageToBlob = async (
-    filename: string,
-  ): Promise<PutBlobResult | null> => {
+  const uploadImageToBlob = async (filename: string): Promise<PutBlobResult | null> => {
     try {
       const cropper = cropperRef.current?.cropper
       if (!cropper) {
@@ -84,7 +82,7 @@ export default function AddProduct() {
 
       // Convert the cropped image to Blob
       return new Promise((resolve, reject) => {
-        cropper.getCroppedCanvas().toBlob(async (blob) => {
+        cropper.getCroppedCanvas().toBlob(async blob => {
           if (!blob) {
             reject(new Error('Failed to create Blob from cropped image'))
             return
@@ -95,13 +93,10 @@ export default function AddProduct() {
           })
 
           // Upload the cropped image to Vercel Blob
-          const response = await fetch(
-            `/api/blob/upload?filename=${file.name}`,
-            {
-              method: 'POST',
-              body: file,
-            },
-          )
+          const response = await fetch(`/api/blob/upload?filename=${file.name}`, {
+            method: 'POST',
+            body: file,
+          })
 
           if (!response.ok) {
             reject(new Error('Failed to upload image'))
@@ -124,9 +119,7 @@ export default function AddProduct() {
     }
   }
 
-  const deleteImageFromBlob = async (
-    url: string | undefined,
-  ): Promise<boolean> => {
+  const deleteImageFromBlob = async (url: string | undefined): Promise<boolean> => {
     try {
       const response = await fetch(`/api/blob/upload?url=${url}`, {
         method: 'DELETE',
@@ -144,7 +137,7 @@ export default function AddProduct() {
   }
 
   const createProduct = async (
-    productData: IProductDto,
+    productData: IProductDto
   ): Promise<IProductDto | undefined> => {
     try {
       const response = await fetch('/api/products', {
@@ -170,7 +163,7 @@ export default function AddProduct() {
     }
   }
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formProductSchema>) {
     try {
       setUploading(true)
       const newBlobResult = await uploadImageToBlob(values.name)
@@ -225,13 +218,8 @@ export default function AddProduct() {
       <div className="flex min-h-screen flex-col items-center justify-center bg-gray-100 p-4">
         <div className="w-full max-w-lg rounded-lg bg-white p-6 shadow-md">
           <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(onSubmit)}
-              className="space-y-4 p-5"
-            >
-              <h1 className="text-center text-2xl font-bold">
-                Cadastrar Produto
-              </h1>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 p-5">
+              <h1 className="text-center text-2xl font-bold">Cadastrar Produto</h1>
               <input
                 type="file"
                 accept="image/*"
@@ -271,10 +259,7 @@ export default function AddProduct() {
                   <FormItem>
                     <FormLabel>Produto</FormLabel>
                     <FormControl>
-                      <Input
-                        placeholder="Informe o nome do produto"
-                        {...field}
-                      />
+                      <Input placeholder="Informe o nome do produto" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -306,10 +291,7 @@ export default function AddProduct() {
                   <FormItem>
                     <FormLabel>Categoria</FormLabel>
                     <FormControl>
-                      <Input
-                        placeholder="Informe a categoria do produto"
-                        {...field}
-                      />
+                      <Input placeholder="Informe a categoria do produto" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -400,11 +382,7 @@ export default function AddProduct() {
                 )}
               />
               <div className="flex justify-between">
-                <Button
-                  type="button"
-                  variant={'alert'}
-                  className="flex items-center"
-                >
+                <Button type="button" variant={'alert'} className="flex items-center">
                   <Undo2 size={20} />
                   <Link href={'/dashboard'}>Voltar</Link>
                 </Button>

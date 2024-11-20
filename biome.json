@@ -23,7 +23,11 @@
       "recommended": true,
       "style": {
         "noNonNullAssertion": "off",
-        "useImportType": "off"
+        "useImportType": "off",
+        "useNumberNamespace": "off"
+      },
+      "correctness": {
+        "useExhaustiveDependencies": "off"
       }
     }
   },

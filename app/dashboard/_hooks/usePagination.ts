@@ -71,10 +71,8 @@ export function usePagination<T>({
   }
 
   const paginatedItems = useMemo(() => {
-    const filtered = items.filter((item) =>
-      (item as Product | Banner).name
-        .toLowerCase()
-        .includes(filter?.toLowerCase() || ''),
+    const filtered = items.filter(item =>
+      (item as Product | Banner).name.toLowerCase().includes(filter?.toLowerCase() || '')
     )
     return filtered.slice((offset - 1) * itemsPerPage, offset * itemsPerPage)
   }, [items, filter, offset, itemsPerPage])

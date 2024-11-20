@@ -14,12 +14,12 @@ export default function User() {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem>
-          <button className="flex gap-2">
+          <button type="button" className="flex gap-2">
             <Settings /> Configurações
           </button>
         </DropdownMenuItem>
         <DropdownMenuItem>
-          <button className="flex gap-2">
+          <button type="button" className="flex gap-2">
             <LogOutIcon /> Sair
           </button>
         </DropdownMenuItem>

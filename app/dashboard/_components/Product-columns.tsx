@@ -18,9 +18,7 @@ export type ProductData = {
   category: string
 }
 
-export const Productcolumns = (
-  fetchData: () => void,
-): ColumnDef<ProductData>[] => [
+export const Productcolumns = (fetchData: () => void): ColumnDef<ProductData>[] => [
   {
     accessorKey: 'imageUrl',
     header: 'Imagem',
@@ -114,9 +112,7 @@ export const Productcolumns = (
         <ArrowUpDown className="ml-2 h-4 w-4" />
       </Button>
     ),
-    cell: ({ row }) => (
-      <div className="text-center">{row.getValue('minQuantity')}</div>
-    ),
+    cell: ({ row }) => <div className="text-center">{row.getValue('minQuantity')}</div>,
   },
   {
     accessorKey: 'status',
