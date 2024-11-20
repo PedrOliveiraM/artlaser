@@ -121,7 +121,7 @@ export async function updateProductStatus(id: string): Promise<Response<Product>
       }
     }
 
-    const updatedProduct = await db.product.update({
+    await db.product.update({
       where: { id: parsedId },
       data: {
         status: !product.status,
@@ -131,7 +131,7 @@ export async function updateProductStatus(id: string): Promise<Response<Product>
     return {
       status: 200,
       message: 'Product status updated successfully',
-      data: updatedProduct,
+      data: null,
     }
   } catch (error) {
     return {
