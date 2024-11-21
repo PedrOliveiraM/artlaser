@@ -73,3 +73,18 @@ export const formBannerSchema = z.object({
     .trim(),
   status: z.enum(['ativo', 'inativo']),
 })
+
+export const formUserSchema = z.object({
+  username: z
+    .string()
+    .trim()
+    .min(5, { message: 'Esse campo deve ter no mínimo 5 letras' }),
+  email: z
+    .string({ message: 'Informe o email' })
+    .trim()
+    .email({ message: 'Email Inválido' }),
+  password: z
+    .string()
+    .min(6, { message: 'A senha deve ter no mínimo 6 caracteres' })
+    .trim(),
+})
