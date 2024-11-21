@@ -1,11 +1,11 @@
 'use client'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { Decimal } from '@prisma/client/runtime/library'
 import { ColumnDef } from '@tanstack/react-table'
+import { ArrowUpDown } from 'lucide-react'
 import Image from 'next/image'
 import DropdownMenuTable from './DropdownMenu-table'
-import { Button } from '@/components/ui/button'
-import { ArrowUpDown } from 'lucide-react'
-import { Badge } from '@/components/ui/badge'
 
 export type ProductData = {
   id: number

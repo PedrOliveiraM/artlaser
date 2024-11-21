@@ -8,6 +8,7 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 
+import { Checkbox } from '@/components/ui/checkbox'
 import {
   Form,
   FormControl,
@@ -18,10 +19,12 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import ForgetPassword from '../_components/ForgetPassword'
 import { formUserSchema } from '../_schema/formSchema'
+import { useRouter } from 'next/navigation'
 
 interface IUserProps {
   username: string
@@ -29,6 +32,12 @@ interface IUserProps {
 }
 
 export function UserForm({ username, email }: IUserProps) {
+  const [isDisabled, setIsDisabled] = useState<boolean>(true)
+  const [checked, setChecked] = useState(false)
+  const router = useRouter()
+  const handleCheckedChange = (value: boolean | 'indeterminate') => {
+    setChecked(value === true)
+  }
   const form = useForm<z.infer<typeof formUserSchema>>({
     resolver: zodResolver(formUserSchema),
     defaultValues: {
@@ -39,6 +48,7 @@ export function UserForm({ username, email }: IUserProps) {
   })
 
   function onSubmit(values: z.infer<typeof formUserSchema>) {
+    alert(JSON.stringify(values))
     console.log(values)
   }
   return (
@@ -57,7 +67,11 @@ export function UserForm({ username, email }: IUserProps) {
                 <FormItem>
                   <FormLabel>Nome do usuário</FormLabel>
                   <FormControl>
-                    <Input placeholder="nome do usuário" {...field} />
+                    <Input
+                      placeholder="nome do usuário"
+                      {...field}
+                      disabled={isDisabled}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -70,7 +84,11 @@ export function UserForm({ username, email }: IUserProps) {
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input placeholder="Informe seu email" {...field} />
+                    <Input
+                      placeholder="Informe seu email"
+                      {...field}
+                      disabled={isDisabled}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -83,16 +101,67 @@ export function UserForm({ username, email }: IUserProps) {
                 <FormItem>
                   <FormLabel>Senha</FormLabel>
                   <FormControl>
-                    <Input placeholder="informe sua senha" {...field} type="password" />
+                    <Input
+                      placeholder="informe sua senha"
+                      {...field}
+                      type="password"
+                      disabled={isDisabled}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
+
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                onCheckedChange={handleCheckedChange}
+                checked={checked}
+                disabled={isDisabled}
+              />
+              <label
+                htmlFor="terms"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Quero mudar a senha
+              </label>
+            </div>
+            {checked && (
+              <FormField
+                control={form.control}
+                name="newPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nova Senha</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="informe sua nova senha"
+                        {...field}
+                        type="password"
+                        disabled={isDisabled}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+
             <ForgetPassword />
             <div className="flex w-full justify-between">
-              <Button variant={'alert'}>Voltar</Button>
-              <Button type="submit">Salvar</Button>
+              <Button variant={'alert'} onClick={() => router.push('/dashboard')}>
+                Voltar
+              </Button>
+              <Button
+                type={isDisabled ? 'button' : 'submit'}
+                onClick={() => {
+                  if (isDisabled) {
+                    setIsDisabled(false)
+                  }
+                }}
+              >
+                {isDisabled ? 'Habilitar' : 'Salvar'}
+              </Button>
             </div>
           </form>
         </Form>

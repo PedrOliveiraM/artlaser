@@ -87,4 +87,9 @@ export const formUserSchema = z.object({
     .string()
     .min(6, { message: 'A senha deve ter no mínimo 6 caracteres' })
     .trim(),
+  newPassword: z
+    .string()
+    .min(6, { message: 'A senha deve ter no mínimo 6 caracteres' })
+    .trim()
+    .optional(),
 })

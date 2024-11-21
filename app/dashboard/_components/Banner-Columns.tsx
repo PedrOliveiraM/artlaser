@@ -1,10 +1,10 @@
 'use client'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { ColumnDef } from '@tanstack/react-table'
+import { ArrowUpDown } from 'lucide-react'
 import Image from 'next/image'
 import DropdownMenuTable from './DropdownMenu-table'
-import { Button } from '@/components/ui/button'
-import { ArrowUpDown } from 'lucide-react'
-import { Badge } from '@/components/ui/badge'
 
 export type BannerData = {
   id: number
@@ -13,9 +13,7 @@ export type BannerData = {
   status: boolean
 }
 
-export const BannerColumns = (
-  fetchData: () => void,
-): ColumnDef<BannerData>[] => [
+export const BannerColumns = (fetchData: () => void): ColumnDef<BannerData>[] => [
   {
     accessorKey: 'imageUrl',
     header: 'Imagem',

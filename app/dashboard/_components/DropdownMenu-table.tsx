@@ -1,4 +1,5 @@
 'use client'
+import Loading from '@/components/loading'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -10,10 +11,9 @@ import {
 import { useToast } from '@/hooks/use-toast'
 import { MoreHorizontal, Pencil, ToggleRight, Trash2 } from 'lucide-react'
 import Link from 'next/link'
+import { useState } from 'react'
 import { deleteBanner, updateBannerStatus } from '../_actions/banner/actions'
 import { deleteProduct, updateProductStatus } from '../_actions/product/actions'
-import { useState } from 'react'
-import Loading from '@/components/loading'
 
 interface IParams {
   id: string

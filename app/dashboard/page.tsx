@@ -1,15 +1,15 @@
 'use client'
+import Loading from '@/components/loading'
+import { useToast } from '@/hooks/use-toast'
+import { ApiResponse } from '@/utils/ApiResponse'
 import { Banner, Product } from '@prisma/client'
 import { useEffect, useState } from 'react'
 import { useCallback } from 'react'
-import Loading from '@/components/loading'
-import { useToast } from '@/hooks/use-toast'
-import { DataTable } from './_components/DataTable'
-import { Productcolumns } from './_components/Product-columns'
 import { BannerColumns } from './_components/Banner-Columns'
-import DashboardLayout from './dashboardLayout'
+import { DataTable } from './_components/DataTable'
 import FieldSet from './_components/FieldSet'
-import { ApiResponse } from '@/utils/ApiResponse'
+import { Productcolumns } from './_components/Product-columns'
+import DashboardLayout from './dashboardLayout'
 
 export default function Home() {
   const [dataProducts, setDataProducts] = useState<Product[]>([])

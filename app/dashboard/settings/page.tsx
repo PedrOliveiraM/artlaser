@@ -1,6 +1,6 @@
 import { db } from '@/lib/prisma'
-import { UserForm } from '../_components/UserForm'
 import { notFound } from 'next/navigation'
+import { UserForm } from '../_components/UserForm'
 
 export default async function Settings() {
   const user = await db.user.findFirst()

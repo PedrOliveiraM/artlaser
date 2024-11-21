@@ -12,11 +12,7 @@ interface IFieldSetProps {
   description: string
 }
 
-export default function FieldSet({
-  children,
-  title,
-  description,
-}: IFieldSetProps) {
+export default function FieldSet({ children, title, description }: IFieldSetProps) {
   return (
     <Card>
       <CardHeader>

@@ -1,6 +1,6 @@
-import ProductChangeForm from '../../_components/Alt-product'
-import { getProductById } from '../../_actions/product/actions'
 import Loading from '@/components/loading'
+import { getProductById } from '../../_actions/product/actions'
+import ProductChangeForm from '../../_components/Alt-product'
 
 interface IParams {
   id: string

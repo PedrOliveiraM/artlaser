@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/prisma'
 import { ApiResponse } from '@/utils/ApiResponse'
 import { bannerSchema } from '@/utils/SchemasValidation'
 import { Banner } from '@prisma/client'
+import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 
 const getErrorMessage = (error: unknown): string => {

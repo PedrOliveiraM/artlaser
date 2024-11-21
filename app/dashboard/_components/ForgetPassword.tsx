@@ -11,14 +11,12 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
-import { useRouter } from 'next/navigation'
 
 const sendEmail = () => {
   console.log('Enviando email')
 }
 
 export default function ForgetPassword() {
-  const router = useRouter()
   return (
     <AlertDialog>
       <AlertDialogTrigger className="hover:text-zinc-500">
@@ -26,15 +24,15 @@ export default function ForgetPassword() {
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Você receberá sua senha por email !</AlertDialogTitle>
+          <AlertDialogTitle>Você receberá sua senha no seu e-mail!</AlertDialogTitle>
           <AlertDialogDescription>
-            Certifique-se que você tenha acesso ao seu email,Pois senão nao poderá
-            recupear a sua senha
+            Certifique-se de ter acesso ao seu e-mail, pois, sem ele, não será possível
+            recuperar sua senha.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancelar</AlertDialogCancel>
-          <AlertDialogAction>
+          <AlertDialogAction asChild>
             <Button type="button" onClick={sendEmail}>
               Enviar
             </Button>
