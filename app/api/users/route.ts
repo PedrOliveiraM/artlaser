@@ -1,0 +1,74 @@
+import { db } from '@/lib/prisma'
+import { ApiResponse } from '@/utils/ApiResponse'
+import { userSchema } from '@/utils/SchemasValidation'
+import { hashPassword } from '@/utils/auth'
+import { User } from '@prisma/client'
+import { NextResponse } from 'next/server'
+import { ZodError } from 'zod'
+
+export async function POST(request: Request) {
+  try {
+    // Obtem o corpo da requisição
+    const body = await request.json()
+
+    // Valida o corpo com o zod
+    const { username, email, password } = userSchema.parse(body)
+
+    // Verifica se email e senha estão presentes (validação adicional)
+    if (!email || !password) {
+      return NextResponse.json<ApiResponse<User>>({
+        status: 400,
+        data: undefined,
+        message: 'Está faltando email ou senha',
+      })
+    }
+
+    // Hash da senha
+    const hashedPassword = await hashPassword(password)
+
+    if (!hashedPassword) {
+      throw new Error('Problema em gerar o hash da senha')
+    }
+
+    // Criação do usuário no banco de dados
+    const newUser = await db.user.create({
+      data: {
+        username,
+        email,
+        password: hashedPassword,
+      },
+    })
+
+    // Retorna sucesso
+    return NextResponse.json<ApiResponse<User>>({
+      status: 200,
+      data: newUser,
+      message: 'Usuário cadastrado com sucesso',
+    })
+  } catch (error) {
+    if (error instanceof ZodError) {
+      const errosMessage: string[] = error.errors.map(
+        err => `${err.path.join('.')} - ${err.message}`
+      )
+
+      return NextResponse.json<ApiResponse<User>>(
+        {
+          status: 400,
+          data: undefined,
+          message: 'Erro de validação nos campos',
+          errors: errosMessage,
+        },
+        { status: 400 } // Define explicitamente o status HTTP
+      )
+    }
+
+    return NextResponse.json<ApiResponse<User>>(
+      {
+        status: 500,
+        data: undefined,
+        message: 'Erro desconhecido',
+      },
+      { status: 500 } // Define explicitamente o status HTTP
+    )
+  }
+}
