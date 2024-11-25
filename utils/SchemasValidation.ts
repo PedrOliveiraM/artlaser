@@ -16,4 +16,5 @@ export const userSchema = z.object({
     .string()
     .min(6, { message: 'A senha deve ter no mínimo 6 caracteres' })
     .trim(),
+  newPassword: z.string().trim().optional(),
 })

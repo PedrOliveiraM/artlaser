@@ -8,13 +8,10 @@ import { ZodError } from 'zod'
 
 export async function POST(request: Request) {
   try {
-    // Obtem o corpo da requisição
     const body = await request.json()
 
-    // Valida o corpo com o zod
     const { username, email, password } = userSchema.parse(body)
 
-    // Verifica se email e senha estão presentes (validação adicional)
     if (!email || !password) {
       return NextResponse.json<ApiResponse<User>>({
         status: 400,
@@ -23,14 +20,12 @@ export async function POST(request: Request) {
       })
     }
 
-    // Hash da senha
     const hashedPassword = await hashPassword(password)
 
     if (!hashedPassword) {
       throw new Error('Problema em gerar o hash da senha')
     }
 
-    // Criação do usuário no banco de dados
     const newUser = await db.user.create({
       data: {
         username,

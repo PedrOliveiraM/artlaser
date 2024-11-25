@@ -27,17 +27,20 @@ import { formUserSchema } from '../_schema/formSchema'
 import { useRouter } from 'next/navigation'
 
 interface IUserProps {
+  id: number
   username: string
   email: string
 }
 
-export function UserForm({ username, email }: IUserProps) {
+export function UserForm({ id, username, email }: IUserProps) {
   const [isDisabled, setIsDisabled] = useState<boolean>(true)
   const [checked, setChecked] = useState(false)
   const router = useRouter()
+
   const handleCheckedChange = (value: boolean | 'indeterminate') => {
     setChecked(value === true)
   }
+
   const form = useForm<z.infer<typeof formUserSchema>>({
     resolver: zodResolver(formUserSchema),
     defaultValues: {
@@ -47,10 +50,40 @@ export function UserForm({ username, email }: IUserProps) {
     },
   })
 
-  function onSubmit(values: z.infer<typeof formUserSchema>) {
-    alert(JSON.stringify(values))
-    console.log(values)
+  async function onSubmit(values: z.infer<typeof formUserSchema>) {
+    try {
+      // ID do usuário (você pode adaptar isso conforme a sua lógica para obter o ID)
+      const userId = id
+
+      // Requisição para a API
+      const response = await fetch(`/api/users/${userId}`, {
+        method: 'PUT', // ou POST se for compatível com a rota
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: values.username,
+          email: values.email,
+          password: values.password,
+          newPassword: values.newPassword,
+        }),
+      })
+
+      // Manipulando a resposta da API
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Erro ao atualizar usuário')
+      }
+
+      alert('Usuário atualizado com sucesso!')
+      console.log('Resposta da API:', data)
+    } catch (error) {
+      console.error('Erro ao enviar dados:', error as string)
+      alert(`Erro: ${error as string}`)
+    }
   }
+
   return (
     <Card className="w-96 shadow-2xl">
       <CardHeader>

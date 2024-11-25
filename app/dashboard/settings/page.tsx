@@ -1,5 +1,4 @@
 import { db } from '@/lib/prisma'
-import { notFound } from 'next/navigation'
 import { UserForm } from '../_components/UserForm'
 
 export default async function Settings() {
@@ -9,7 +8,7 @@ export default async function Settings() {
 
   return (
     <div className="h-screen flex justify-center items-center">
-      <UserForm email={user?.email} username={user.username} />
+      <UserForm id={user?.id} email={user?.email} username={user.username} />
     </div>
   )
 }
