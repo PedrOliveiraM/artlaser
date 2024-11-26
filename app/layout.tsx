@@ -1,7 +1,8 @@
 import { Inter } from 'next/font/google'
 import type { Metadata } from 'next'
 import './globals.css'
-import ClientOnly from '@/components/clientOnly'
+import Toast from '@/components/clientOnly'
+import SessionProvider from '@/providers/session'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -21,8 +22,10 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body className={`${inter.className} antialiased`}>
-        <main>{children}</main>
-        <ClientOnly />
+        <main>
+          <SessionProvider>{children}</SessionProvider>
+        </main>
+        <Toast />
       </body>
     </html>
   )

@@ -73,3 +73,4 @@ export const formBannerSchema = z.object({
     .trim(),
   status: z.enum(['ativo', 'inativo']),
 })
+
