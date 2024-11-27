@@ -1,5 +1,13 @@
-import { redirect } from 'next/navigation'
+import { SignIn } from '@/components/signin-button'
 
-export default function Home() {
-  return redirect('/dashboard')
+const Home = async () => {
+  return (
+    <>
+      <main className="w-full h-screen flex justify-center items-center">
+        <SignIn />
+      </main>
+    </>
+  )
 }
+
+export default Home

@@ -1,36 +1,39 @@
-import NextAuth from 'next-auth'
+import bcrypt from 'bcryptjs'
+import NextAuth, { CredentialsSignin } from 'next-auth'
 import Credentials from 'next-auth/providers/credentials'
 import { db } from './prisma'
-import { userSchema } from '@/utils/SchemasValidation'
-import bcrypt from 'bcryptjs'
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     Credentials({
+      name: 'Credentials',
+
       credentials: {
-        username: { label: 'username', type: 'username' },
-        password: { label: 'password', type: 'password' },
+        email: { label: 'Email', type: 'email' },
+        password: { label: 'Password', type: 'password' },
       },
-      async authorize(credentials) {
+
+      authorize: async credentials => {
         try {
-          const { username, password } = userSchema.parse(credentials)
+          const email = credentials.email as string | undefined
+          const password = credentials.password as string | undefined
+
+          if (!email || !password) return null
 
           const user = await db.user.findUnique({
-            where: { username },
+            where: { email: email as string },
           })
 
-          if (!user) {
-            throw new Error('User not exist')
-          }
+          if (!user || !user.password) return null
 
-          const isPassWordValid = await bcrypt.compare(password, user.password)
+          const isPasswordValid = await bcrypt.compare(password as string, user.password)
 
-          if (!isPassWordValid) throw new Error('Invalid credentials.')
+          if (!isPasswordValid) return null
 
           return {
             id: user.id.toString(),
+            name: user.username,
             email: user.email,
-            username: user.username,
           }
         } catch (error) {
           return null
@@ -38,7 +41,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       },
     }),
   ],
-  session: {
-    strategy: 'jwt',
+
+  pages: {
+    signIn: '/signin',
+    error: '/error',
   },
+  debug: false,
 })

@@ -1,3 +1,5 @@
+'use client'
+import { SignOut } from '@/components/signout-button'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,7 +12,7 @@ export default function User() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <CircleUserRound size={40} className="hover:scale-105" />
+        <CircleUserRound size={30} className="hover:scale-105" />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem>
@@ -19,9 +21,7 @@ export default function User() {
           </button>
         </DropdownMenuItem>
         <DropdownMenuItem>
-          <button type="button" className="flex gap-2">
-            <LogOutIcon /> Sair
-          </button>
+          <SignOut />
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

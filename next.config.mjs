@@ -10,6 +10,4 @@ const nextConfig = {
     ],
   },
 }
-
-// Use export default para exportar a configuração
 export default nextConfig

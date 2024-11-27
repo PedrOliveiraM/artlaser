@@ -1,127 +1,96 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
-import * as z from 'zod'
-
 import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { toast } from '@/hooks/use-toast'
 import { signIn } from 'next-auth/react'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
+import { userSchema } from '@/utils/SchemasValidation'
+import { useToast } from '@/hooks/use-toast'
+import { useRouter } from 'next/navigation'
 
-const formSchema = z.object({
-  username: z.string().min(6, {
-    message: 'Nome muito pequeno',
-  }),
-  password: z.string().min(6, {
-    message: 'Senha muito pequena',
-  }),
-})
-
-export default function SignIn() {
+export default function SignInPage() {
+  const { toast } = useToast()
   const router = useRouter()
-  const [isLoading, setIsLoading] = useState(false)
-
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof userSchema>>({
+    resolver: zodResolver(userSchema),
     defaultValues: {
-      username: '',
+      email: '',
       password: '',
     },
   })
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    setIsLoading(true)
+  const onSubmit = async (values: z.infer<typeof userSchema>) => {
+    const result = await signIn('credentials', {
+      email: values.email,
+      password: values.password,
+      redirect: false, // Não redireciona automaticamente
+    })
 
-    try {
-      // Attempt to sign in using NextAuth credentials provider
-      const result = await signIn('credentials', {
-        redirect: false, // Prevent automatic redirection by NextAuth
-        username: values.username, // Adjust based on your form fields
-        password: values.password, // Adjust based on your form fields
-      })
-
-      if (result?.error) {
-        // Handle failed login
-        toast({
-          title: 'Sign in failed',
-          description: result.error,
-          variant: 'destructive',
-        })
-      } else {
-        // Handle successful login
-        toast({
-          title: 'Sign in successful',
-          description: 'You have been signed in.',
-        })
-
-        // Redirect to dashboard or home page after successful login
-        const router = useRouter()
-        router.push('/dashboard')
-      }
-    } catch (error) {
+    if (result?.error) {
+      // Se houver erro, exibe o toast
       toast({
-        title: 'Sign in error',
-        description: 'An unexpected error occurred. Please try again.',
+        title: 'Erro',
+        description: 'Credenciais Inválidas',
         variant: 'destructive',
       })
-    } finally {
-      setIsLoading(false)
+      form.reset() // Reseta o formulário
+    } else {
+      // Se o login for bem-sucedido, redireciona para o dashboard
+      router.push('/dashboard')
     }
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-100">
-      <div className="w-full max-w-md space-y-8 rounded-lg bg-white p-10 shadow-md">
-        <div className="text-center">
-          <h2 className="mt-6 text-3xl font-bold text-gray-900">Artlaser</h2>
-        </div>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <FormField
-              control={form.control}
-              name="username"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Usuário</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Informe seu nome de usuáro" {...field} />
-                  </FormControl>
-                  <FormDescription>Nunca compartilhe seu nome de usuário</FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Senha</FormLabel>
-                  <FormControl>
-                    <Input type="password" placeholder="Digite sua senha" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? 'Signing in...' : 'Sign in'}
-            </Button>
-          </form>
-        </Form>
-      </div>
+    <div className="w-full h-screen flex justify-center items-center">
+      <Card>
+        <CardHeader className="text-center font-bold">Fazer Login</CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Usuário</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Informe seu email" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Senha</FormLabel>
+                    <FormControl>
+                      <Input type="password" placeholder="Digite sua senha" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button type="submit" className="w-full">
+                Entrar
+              </Button>
+            </form>
+          </Form>
+        </CardContent>
+      </Card>
     </div>
   )
 }
