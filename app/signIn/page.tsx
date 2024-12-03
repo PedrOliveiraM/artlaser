@@ -21,6 +21,7 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
+import { motion } from 'framer-motion' // Importação do framer-motion
 
 export default function SignInPage() {
   const { toast } = useToast()
@@ -58,7 +59,13 @@ export default function SignInPage() {
   return (
     <main className="flex h-screen justify-center bg-gray-100">
       {isLoading && <Loading />}
-      <div className="flex flex-col justify-center w-full max-w-md p-8 bg-white shadow-md md:w-1/2">
+
+      <motion.div
+        initial={{ opacity: 0, x: -50 }} // Posição inicial
+        animate={{ opacity: 1, x: 0 }} // Animação de entrada
+        transition={{ duration: 0.8 }} // Duração da animação
+        className="flex flex-col justify-center w-full max-w-md p-8 bg-white shadow-md md:w-1/2"
+      >
         <h1 className="mb-6 text-3xl font-bold text-center text-gray-800">
           Bem-vindo(a)
         </h1>
@@ -115,9 +122,14 @@ export default function SignInPage() {
             Esqueceu a senha ?
           </Link>
         </Button>
-      </div>
+      </motion.div>
 
-      <div className="hidden md:block md:w-1/2">
+      <motion.div
+        initial={{ opacity: 0, x: 50 }} // Posição inicial
+        animate={{ opacity: 1, x: 0 }} // Animação de entrada
+        transition={{ duration: 0.8, delay: 0.2 }} // Duração e atraso
+        className="hidden md:block md:w-1/2"
+      >
         <div className="relative w-full h-full">
           <Image
             src="/imagens/Artlaser.jpeg"
@@ -126,7 +138,7 @@ export default function SignInPage() {
             className="object-cover"
           />
         </div>
-      </div>
+      </motion.div>
     </main>
   )
 }
