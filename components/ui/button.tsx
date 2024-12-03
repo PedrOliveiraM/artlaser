@@ -18,6 +18,8 @@ const buttonVariants = cva(
           'bg-yellow-500 text-destructive-foreground shadow-sm hover:bg-yellow-600/90',
         success:
           'bg-green-500 text-destructive-foreground shadow-sm hover:bg-green-600/90',
+          login:
+          'bg-orange-500 text-destructive-foreground shadow-sm hover:bg-orange-600/90',
         secondary:
           'bg-secondary text-secondary-foreground hover:bg-secondary/80',
         ghost: 'hover:bg-accent hover:text-accent-foreground',

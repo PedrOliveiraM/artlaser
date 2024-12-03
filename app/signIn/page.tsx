@@ -1,7 +1,7 @@
 'use client'
 
+import Loading from '@/components/loading'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import {
   Form,
   FormControl,
@@ -11,17 +11,21 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { signIn } from 'next-auth/react'
+import { useToast } from '@/hooks/use-toast'
+import { userSchema } from '@/utils/SchemasValidation'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { signIn } from 'next-auth/react'
+import Image from 'next/image'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { userSchema } from '@/utils/SchemasValidation'
-import { useToast } from '@/hooks/use-toast'
-import { useRouter } from 'next/navigation'
 
 export default function SignInPage() {
   const { toast } = useToast()
   const router = useRouter()
+  const [isLoading, setIsLoading] = useState(false)
   const form = useForm<z.infer<typeof userSchema>>({
     resolver: zodResolver(userSchema),
     defaultValues: {
@@ -31,12 +35,13 @@ export default function SignInPage() {
   })
 
   const onSubmit = async (values: z.infer<typeof userSchema>) => {
+    setIsLoading(true)
     const result = await signIn('credentials', {
       email: values.email,
       password: values.password,
       redirect: false, // Não redireciona automaticamente
     })
-
+    setIsLoading(false)
     if (result?.error) {
       // Se houver erro, exibe o toast
       toast({
@@ -50,47 +55,78 @@ export default function SignInPage() {
       router.push('/dashboard')
     }
   }
-
   return (
-    <div className="w-full h-screen flex justify-center items-center">
-      <Card>
-        <CardHeader className="text-center font-bold">Fazer Login</CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Usuário</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Informe seu email" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Senha</FormLabel>
-                    <FormControl>
-                      <Input type="password" placeholder="Digite sua senha" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit" className="w-full">
-                Entrar
-              </Button>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
-    </div>
+    <main className="flex h-screen justify-center bg-gray-100">
+      {isLoading && <Loading />}
+      <div className="flex flex-col justify-center w-full max-w-md p-8 bg-white shadow-md md:w-1/2">
+        <h1 className="mb-6 text-3xl font-bold text-center text-gray-800">
+          Bem-vindo(a)
+        </h1>
+        <p className="mb-8 text-sm text-center text-gray-500">
+          Faça login para acessar o painel administrativo da ArtLaser.
+        </p>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Informe seu email"
+                      {...field}
+                      className="text-black"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Senha</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      placeholder="Digite sua senha"
+                      {...field}
+                      className="text-black"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button type="submit" variant={'login'} className="w-full">
+              Entrar
+            </Button>
+          </form>
+        </Form>
+        <p className="mt-6 text-xs text-center text-gray-500">
+          © 2024 ArtLaser. Todos os direitos reservados.
+        </p>
+        <Button variant="link" className="mt-4">
+          <Link href="/forgot-password" className="text-sm text-black">
+            Esqueceu a senha ?
+          </Link>
+        </Button>
+      </div>
+
+      <div className="hidden md:block md:w-1/2">
+        <div className="relative w-full h-full">
+          <Image
+            src="/imagens/Artlaser.jpeg"
+            alt="Logo ArtLaser"
+            fill
+            className="object-cover"
+          />
+        </div>
+      </div>
+    </main>
   )
 }
