@@ -16,6 +16,8 @@
     "@hookform/resolvers": "^3.9.0",
     "@mui/material": "^6.1.5",
     "@prisma/client": "^5.21.1",
+    "@radix-ui/react-alert-dialog": "^1.1.2",
+    "@radix-ui/react-checkbox": "^1.1.2",
     "@radix-ui/react-dialog": "^1.1.2",
     "@radix-ui/react-dropdown-menu": "^2.1.2",
     "@radix-ui/react-label": "^2.1.0",
@@ -27,11 +29,15 @@
     "@tanstack/react-table": "^8.20.5",
     "@vercel/blob": "^0.25.1",
     "bcrypt": "^5.1.1",
+<<<<<<< HEAD
     "bcryptjs": "^2.4.3",
+=======
+>>>>>>> de628974b4579f25177a316909084aea88e583c3
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "framer-motion": "^11.13.1",
     "git-commit-msg-linter": "^5.0.8",
+    "jose": "^5.9.6",
     "lucide-react": "^0.453.0",
     "next": "14.2.10",
     "next-auth": "^5.0.0-beta.25",
@@ -49,7 +55,10 @@
   "devDependencies": {
     "@rocketseat/eslint-config": "^2.2.2",
     "@types/bcrypt": "^5.0.2",
+<<<<<<< HEAD
     "@types/bcryptjs": "^2.4.6",
+=======
+>>>>>>> de628974b4579f25177a316909084aea88e583c3
     "@types/node": "^20.17.3",
     "@types/react": "^18",
     "@types/react-dom": "^18",

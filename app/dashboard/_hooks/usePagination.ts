@@ -1,6 +1,6 @@
-import { useState, useMemo, useEffect } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
 import { Banner, Product } from '@prisma/client'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { useEffect, useMemo, useState } from 'react'
 
 interface UsePaginationProps<T> {
   items: T[]
