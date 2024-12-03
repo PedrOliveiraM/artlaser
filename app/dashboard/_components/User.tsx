@@ -7,6 +7,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { CircleUserRound, LogOutIcon, Settings } from 'lucide-react'
+import Link from 'next/link'
 
 export default function User() {
   return (
@@ -16,9 +17,9 @@ export default function User() {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem>
-          <button type="button" className="flex gap-2">
+          <Link href="/dashboard/settings" className="flex gap-2">
             <Settings /> Configurações
-          </button>
+          </Link>
         </DropdownMenuItem>
         <DropdownMenuItem>
           <SignOut />
