@@ -29,10 +29,7 @@
     "@tanstack/react-table": "^8.20.5",
     "@vercel/blob": "^0.25.1",
     "bcrypt": "^5.1.1",
-<<<<<<< HEAD
     "bcryptjs": "^2.4.3",
-=======
->>>>>>> de628974b4579f25177a316909084aea88e583c3
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "framer-motion": "^11.13.1",
@@ -55,10 +52,7 @@
   "devDependencies": {
     "@rocketseat/eslint-config": "^2.2.2",
     "@types/bcrypt": "^5.0.2",
-<<<<<<< HEAD
     "@types/bcryptjs": "^2.4.6",
-=======
->>>>>>> de628974b4579f25177a316909084aea88e583c3
     "@types/node": "^20.17.3",
     "@types/react": "^18",
     "@types/react-dom": "^18",

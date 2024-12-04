@@ -74,8 +74,6 @@ export const formBannerSchema = z.object({
   status: z.enum(['ativo', 'inativo']),
 })
 
-<<<<<<< HEAD
-=======
 export const formUserSchema = z.object({
   username: z
     .string()
@@ -95,4 +93,3 @@ export const formUserSchema = z.object({
     .trim()
     .optional(),
 })
->>>>>>> de628974b4579f25177a316909084aea88e583c3
