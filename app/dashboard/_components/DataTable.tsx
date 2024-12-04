@@ -14,7 +14,6 @@ import {
 } from '@tanstack/react-table'
 import { ChevronDownIcon, ChevronsLeft, ChevronsRight } from 'lucide-react'
 import * as React from 'react'
-
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -33,6 +32,7 @@ import {
 } from '@/components/ui/table'
 import { Decimal } from '@prisma/client/runtime/library'
 import Link from 'next/link'
+import { useEffect } from 'react'
 
 export type ProductData = {
   id: number
@@ -86,6 +86,31 @@ export function DataTable<TData, TValue>({
       rowSelection,
     },
   })
+
+  function adjustMobileColumnsVisibility() {
+    const screenWidth = window.innerWidth
+    const isMobile = screenWidth < 768 // Define a regra para mobile
+
+    // Ajustar visibilidade das colunas
+    table
+      .getAllColumns()
+      .filter(column => column.getCanHide())
+      .map(column => {
+        column.toggleVisibility(
+          isMobile ? column.id === 'actions' || column.id === 'imageUrl' : true
+        )
+      })
+  }
+
+  useEffect(() => {
+    adjustMobileColumnsVisibility()
+
+    // Atualizar ao redimensionar a janela
+    const handleResize = () => adjustMobileColumnsVisibility()
+    window.addEventListener('resize', handleResize)
+
+    return () => window.removeEventListener('resize', handleResize)
+  }, [table])
 
   const columnNamesBanner: Record<string, string> = {
     imageUrl: 'Imagem',
