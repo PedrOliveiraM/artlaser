@@ -3,6 +3,7 @@
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
+import { Suspense } from 'react'
 
 enum EError {
   Configuration = 'Configuration',
@@ -19,6 +20,14 @@ const errorMap = {
 }
 
 export default function AuthErrorPage() {
+  return (
+    <Suspense fallback={<div>Carregando...</div>}>
+      <ErrorContent />
+    </Suspense>
+  )
+}
+
+function ErrorContent() {
   const search = useSearchParams()
   const error = search.get('error') as EError
 

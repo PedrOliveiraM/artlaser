@@ -10,7 +10,7 @@ export async function POST(request: Request) {
   try {
     const body = await request.json()
 
-    const { username, email, password } = userSchema.parse(body)
+    const { email, password } = userSchema.parse(body)
 
     if (!email || !password) {
       return NextResponse.json<ApiResponse<User>>({
@@ -28,7 +28,7 @@ export async function POST(request: Request) {
 
     const newUser = await db.user.create({
       data: {
-        username,
+        username: '',
         email,
         password: hashedPassword,
       },
