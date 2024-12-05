@@ -26,31 +26,20 @@ export const userSchema = z.object({
   }),
 })
 
-export const settingsSchema = z
-  .object({
-    username: z
-      .string()
-      .min(6, {
-        message: 'Deve ter pelo menos 6 caracteres',
-      })
-      .trim(),
-    email: z.string().trim().email({ message: 'Email inválido' }),
-    password: z.string().trim().min(6, {
+export const settingsSchema = z.object({
+  username: z
+    .string()
+    .min(6, {
       message: 'Deve ter pelo menos 6 caracteres',
-    }),
-    newPassword: z.string().min(6).optional(), // Nova senha opcional
-    confirmNewPassword: z.string().min(6).optional(), // Confirmar nova senha opcional
-  })
-  .refine(
-    data => {
-      // Se a nova senha foi fornecida, a confirmação deve ser igual
-      if (data.newPassword && data.confirmNewPassword) {
-        return data.newPassword === data.confirmNewPassword
-      }
-      return true // Caso contrário, apenas retorna true
-    },
-    {
-      message: 'As senhas não coincidem',
-      path: ['confirmNewPassword'], // Aponta para o campo confirmNewPassword
-    }
-  )
+    })
+    .trim(),
+  email: z.string().email({ message: 'Email inválido' }),
+  password: z
+    .string()
+    .min(6, {
+      message: 'Deve ter pelo menos 6 caracteres',
+    })
+    .trim(),
+  newPassword: z.string().optional(),
+  checked: z.boolean().optional(),
+})

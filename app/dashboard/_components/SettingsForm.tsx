@@ -8,6 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import { Checkbox } from '@/components/ui/checkbox'
 import {
   Form,
   FormControl,
@@ -22,7 +23,10 @@ import { useToast } from '@/hooks/use-toast'
 import { ApiResponse } from '@/utils/ApiResponse'
 import { settingsSchema } from '@/utils/SchemasValidation'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { CheckedState } from '@radix-ui/react-checkbox'
+import { signOut } from 'next-auth/react'
 import Link from 'next/link'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -32,24 +36,24 @@ interface IDefaultValues {
   email: string
   password: string
   newPassword: string
-  confirmNewPassword: string
 }
 
 export default function SettingsForm(defaultValues: IDefaultValues) {
-  const formSchema = settingsSchema
-
   const { toast } = useToast()
+  const [checked, setChecked] = useState<CheckedState>(false)
+
+  const formSchema = settingsSchema
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues,
+    defaultValues: {
+      ...defaultValues,
+      checked: false,
+    },
   })
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      console.log('Valores do formulário:', values)
-      console.log('Valor do ID:', defaultValues.id)
-
       const response = await fetch(`/api/users/${defaultValues.id}`, {
         method: 'PUT',
         headers: {
@@ -66,13 +70,14 @@ export default function SettingsForm(defaultValues: IDefaultValues) {
       const data: ApiResponse<UserDto> = await response.json()
 
       if (response.ok) {
-        console.log('Usuário atualizado com sucesso:', data.data)
         toast({
           title: 'Usuário atualizado com sucesso',
           variant: 'success',
         })
+        signOut({
+          redirectTo: '/signin',
+        })
       } else {
-        console.error('Erro ao atualizar usuário:', data.message)
         toast({
           title: 'Erro ao atualizar usuário',
           description: data.message,
@@ -82,7 +87,6 @@ export default function SettingsForm(defaultValues: IDefaultValues) {
 
       form.reset()
     } catch (error) {
-      console.error('Erro ao salvar as alterações:', error)
       toast({
         title: 'Ocorreu um erro no servidor',
         description: 'Tente novamente mais tarde. Ou entre em contato com o suporte.',
@@ -158,41 +162,35 @@ export default function SettingsForm(defaultValues: IDefaultValues) {
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="newPassword"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nova Senha</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        type="password"
-                        placeholder="Digite uma nova senha"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <Separator />
+              <div className="flex gap-2 items-center">
+                <Checkbox
+                  id="chance-password"
+                  checked={checked}
+                  onCheckedChange={setChecked}
+                />
+                <span>Alterar Senha</span>
+              </div>
 
-              <FormField
-                control={form.control}
-                name="confirmNewPassword"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Confirme a Nova Senha</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        type="password"
-                        placeholder="Confirme a nova senha"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {checked && (
+                <FormField
+                  control={form.control}
+                  name="newPassword"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Nova Senha</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          type="password"
+                          placeholder="Digite uma nova senha"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
 
               <div className="flex justify-between">
                 <Button type="submit" className="w-full md:w-auto">

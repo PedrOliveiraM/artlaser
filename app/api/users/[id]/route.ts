@@ -26,8 +26,11 @@ export async function PUT(
 
     const parsedId = parseInt(id)
     const body = await request.json()
+
+    // Ajustar o esquema para refletir a estrutura real do corpo da requisição
     const parsedBody = settingsSchema.parse(body)
 
+    // Buscar usuário no banco de dados
     const user = await db.user.findUnique({
       where: { id: parsedId },
     })
@@ -39,6 +42,15 @@ export async function PUT(
       )
     }
 
+    // Verificar se a senha foi enviada para validação
+    if (!parsedBody.password || !user.password) {
+      return NextResponse.json<ApiResponse<null>>(
+        { message: 'Senha atual é obrigatória', status: 400 },
+        { status: 400 }
+      )
+    }
+
+    // Validar a senha atual
     const isPasswordValid = await bcrypt.compare(parsedBody.password, user.password)
 
     if (!isPasswordValid) {
@@ -48,6 +60,7 @@ export async function PUT(
       )
     }
 
+    // Atualizar apenas os campos enviados no corpo da requisição
     const updatedData: { username?: string; email?: string; password?: string } = {}
 
     if (parsedBody.username) {
@@ -62,6 +75,7 @@ export async function PUT(
       updatedData.password = await bcrypt.hash(parsedBody.newPassword, 10)
     }
 
+    // Atualizar usuário no banco de dados
     const updatedUser = await db.user.update({
       where: { id: parsedId },
       data: updatedData,
