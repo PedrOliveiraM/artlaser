@@ -1,8 +1,5 @@
-import { Inter } from 'next/font/google'
-import { Header } from './_components/Header'
 import { Footer } from './_components/Footer'
-
-const inter = Inter({ subsets: ['latin'] })
+import { Header } from './_components/Header'
 
 export const metadata = {
   title: 'Artlaser',
@@ -16,16 +13,12 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
-        <div className="relative min-h-screen flex flex-col">
-          <Header />
-          <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            {children}
-          </main>
-          <Footer />
-        </div>
-      </body>
-    </html>
+    <div className="relative min-h-screen flex flex-col">
+      <Header />
+      <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {children}
+      </main>
+      <Footer />
+    </div>
   )
 }

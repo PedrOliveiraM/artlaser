@@ -108,9 +108,7 @@ export function ProductItem({
       </CardContent>
 
       <CardFooter className="p-4">
-        <Button className="w-full bg-blue-600 text-white hover:bg-blue-700">
-          Comprar
-        </Button>
+        <Button className="w-full">Comprar</Button>
       </CardFooter>
     </Card>
   )

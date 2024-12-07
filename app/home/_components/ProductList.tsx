@@ -1,22 +1,49 @@
-import { db } from '@/lib/prisma'
-import React from 'react'
+'use client'
+import { useState } from 'react'
 import { ProductItem } from './ProductItem'
+import { SearchMenu } from './SearchMenu'
 
-export async function ProductList() {
-  const products = await db.product.findMany()
+export interface SerializedProducts {
+  retailPrice: number
+  wholesalePrice: number
+  name: string
+  id: number
+  description: string
+  category: string
+  minQuantity: number
+  imageUrl: string
+  status: boolean
+  CreatedAt: Date
+}
 
-  // Transforme Decimal em números
-  const serializedProducts = products.map(product => ({
-    ...product,
-    retailPrice: product.retailPrice.toNumber(),
-    wholesalePrice: product.wholesalePrice.toNumber(),
-  }))
+export function ProductList({ products }: { products: SerializedProducts[] }) {
+  const [filteredProducts, setFilteredProducts] = useState<SerializedProducts[]>(products)
+
+  const handleSelectCategory = (category: string) => {
+    if (!category) return setFilteredProducts(products)
+    setFilteredProducts(products.filter(product => product.category === category))
+  }
+
+  const handleChangeSearch = (search: string) => {
+    setFilteredProducts(
+      products.filter(product =>
+        product.name.toLowerCase().includes(search.toLowerCase())
+      )
+    )
+  }
 
   return (
-    <div className="grid grid-cols-2 mx-auto max-w-7xl mb-16 gap-2 sm:grid-cols-2 md:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
-      {serializedProducts.map(product => (
-        <ProductItem key={product.id} {...product} />
-      ))}
+    <div className="flex flex-col">
+      <SearchMenu
+        data={products}
+        handleSelectCategory={handleSelectCategory}
+        handleChangeSearch={handleChangeSearch}
+      />
+      <div className="grid grid-cols-2 mx-auto max-w-7xl mb-16 gap-2 sm:grid-cols-2 md:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
+        {filteredProducts.map(product => (
+          <ProductItem key={product.id} {...product} />
+        ))}
+      </div>
     </div>
   )
 }

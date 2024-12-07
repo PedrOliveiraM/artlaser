@@ -2,7 +2,7 @@ import { SheetContent } from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import Link from 'next/link'
-import { Instagram, MapPin, ShoppingBag, MessageCircle } from 'lucide-react'
+import { Instagram, MapPin, MessageCircle } from 'lucide-react'
 
 interface SideMenuContentProps {
   setIsSideMenuOpen: (value: boolean) => void

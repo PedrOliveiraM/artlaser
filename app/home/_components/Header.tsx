@@ -1,12 +1,11 @@
 'use client'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetTrigger } from '@/components/ui/sheet'
-import { Menu } from 'lucide-react'
-import { SideMenuContent } from './SideMenuContent'
-import { ShoppingCart } from 'lucide-react'
+import { Menu, ShoppingCart } from 'lucide-react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useState } from 'react'
-import Image from 'next/image'
+import { SideMenuContent } from './SideMenuContent'
 
 export function Header() {
   const [isSideMenuOpen, setIsSideMenuOpen] = useState(false)
@@ -29,12 +28,7 @@ export function Header() {
           </Sheet>
 
           <Link href="/" className="mr-6 flex items-center space-x-2">
-            <Image
-              src="/imagens/Logo.png"
-              alt="Logo ArtLaser"
-              width={150}
-              height={50}
-            />
+            <Image src="/imagens/Logo.png" alt="Logo ArtLaser" width={150} height={50} />
           </Link>
         </div>
 
