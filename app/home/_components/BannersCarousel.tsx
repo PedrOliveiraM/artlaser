@@ -8,20 +8,21 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/components/ui/carousel'
+import { ApiResponse } from '@/utils/ApiResponse'
 import { Banner } from '@prisma/client'
 import Autoplay from 'embla-carousel-autoplay'
+import Image from 'next/image'
 import { useEffect, useRef, useState } from 'react'
 
 export function BannersCarousel() {
-  const plugin = useRef(Autoplay({ delay: 2000, stopOnInteraction: true }))
   const [banners, setBanners] = useState<Banner[]>([])
 
   useEffect(() => {
     const fetchBanners = async () => {
       try {
         const response = await fetch('/api/banners')
-        const data: Banner[] = await response.json()
-        setBanners(data)
+        const data: ApiResponse<Banner[]> = await response.json()
+        setBanners(data.data || [])
       } catch (error) {
         console.error('Error fetching banners:', error)
       }
@@ -30,33 +31,34 @@ export function BannersCarousel() {
     fetchBanners()
   }, [])
 
+  const plugin = useRef(Autoplay({ delay: 10000, stopOnInteraction: true }))
+
   return (
     <Carousel
       plugins={[plugin.current]}
-      className="w-full"
+      className="w-full max-w-7xl mx-auto"
       onMouseEnter={plugin.current.stop}
       onMouseLeave={plugin.current.reset}
     >
       <CarouselContent>
-        {Array.isArray(banners) &&
-          banners.map(banner => (
-            <CarouselItem key={banner.id}>
-              <div className="p-1">
-                <Card>
-                  <CardContent className="flex aspect-video items-center justify-center p-6">
-                    <img
-                      src={banner.imageUrl}
-                      alt={banner.name}
-                      className="w-full h-full object-cover"
-                    />
-                    <h1>teste</h1>
-                  </CardContent>
-                </Card>
-              </div>
-            </CarouselItem>
-          ))}
+        {banners.map((banner, index) => (
+          <CarouselItem key={index}>
+            <div className="p-1 w-full h-full">
+              <Card className="w-full h-full">
+                <CardContent className="flex w-full h-full items-center justify-center md:p-6 p-1">
+                  <Image
+                    className="rounded-sm"
+                    src={banner.imageUrl}
+                    alt={banner.name}
+                    width={1280}
+                    height={300}
+                  />
+                </CardContent>
+              </Card>
+            </div>
+          </CarouselItem>
+        ))}
       </CarouselContent>
-
       <CarouselPrevious />
       <CarouselNext />
     </Carousel>
