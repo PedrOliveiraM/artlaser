@@ -2,6 +2,8 @@
 import { useState } from 'react'
 import { ProductItem } from './ProductItem'
 import { SearchMenu } from './SearchMenu'
+import { CarouselEmbla } from './carousel/CarouselEmbla'
+import Image from 'next/image'
 
 export interface SerializedProducts {
   retailPrice: number
@@ -33,7 +35,11 @@ export function ProductList({ products }: { products: SerializedProducts[] }) {
   }
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col justify-center">
+      <div className="relative w-full max-w-7xl mx-auto">
+        <CarouselEmbla />
+      </div>
+
       <SearchMenu
         data={products}
         handleSelectCategory={handleSelectCategory}
@@ -47,3 +53,16 @@ export function ProductList({ products }: { products: SerializedProducts[] }) {
     </div>
   )
 }
+/*
+<div className="relative w-full max-w-7xl mx-auto">
+        <Image
+          src="https://rpe3c59juxn54zf2.public.blob.vercel-storage.com/BannerPromo-sjAbxdguronPg1UJXRelOdBZtWbb3H.png"
+          alt="Artlaser"
+          className="object-cover w-full"
+          style={{ maxHeight: '300px', borderRadius: '10px' }} // Limita a altura da imagem
+          width={1920}
+          height={300}
+        />
+      </div>
+
+*/

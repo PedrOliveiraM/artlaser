@@ -63,8 +63,6 @@ export function SearchMenu({
     listCategories()
   }, [])
 
-  console.log('valor selecinado', value)
-
   const resetFilter = () => {
     setValue('')
     handleSelectCategory('')

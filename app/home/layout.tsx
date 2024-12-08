@@ -1,3 +1,4 @@
+import { CarouselEmbla } from './_components/carousel/CarouselEmbla'
 import { Footer } from './_components/Footer'
 import { Header } from './_components/Header'
 
