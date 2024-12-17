@@ -1,9 +1,9 @@
 'use client'
+import Loading from '@/components/loading'
 import { SessionProvider } from 'next-auth/react'
-import { Dashboard } from './_components/Dashboard'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import Loading from '@/components/loading'
+import { Dashboard } from './_components/Dashboard'
 
 export default function Administrator() {
   const { data: session, status } = useSession()

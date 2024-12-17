@@ -1,5 +1,4 @@
 'use client'
-import { Check, ChevronsUpDown, FilterX } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Command,
@@ -10,17 +9,16 @@ import {
   CommandList,
 } from '@/components/ui/command'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { cn } from '@/lib/utils'
-import { Product } from '@prisma/client'
-import { Search } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import { SerializedProducts } from './ProductList'
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
+import { cn } from '@/lib/utils'
+import { Check, ChevronsUpDown, FilterX, Search } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { SerializedProducts } from './ProductList'
 
 type CategoryOption = {
   value: string

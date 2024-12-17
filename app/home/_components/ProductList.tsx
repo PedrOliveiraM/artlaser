@@ -1,8 +1,8 @@
 'use client'
 import { useState } from 'react'
+import { BannersCarousel } from './BannersCarousel'
 import { ProductItem } from './ProductItem'
 import { SearchMenu } from './SearchMenu'
-import { BannersCarousel } from './BannersCarousel'
 
 export interface SerializedProducts {
   retailPrice: number

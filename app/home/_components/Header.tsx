@@ -32,7 +32,7 @@ export function Header() {
           </Link>
         </div>
 
-        <Link href="/cart" className="relative transition-colors hover:text-primary">
+        <Link href="/home/cart" className="relative transition-colors hover:text-primary">
           <ShoppingCart className="h-6 w-6" strokeWidth={3} />
         </Link>
       </div>

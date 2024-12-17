@@ -14,6 +14,7 @@ import { Input } from '@/components/ui/input'
 import { useToast } from '@/hooks/use-toast'
 import { userSchema } from '@/utils/SchemasValidation'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { motion } from 'framer-motion' // Importação do framer-motion
 import { signIn } from 'next-auth/react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -21,7 +22,6 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { motion } from 'framer-motion' // Importação do framer-motion
 
 export default function SignInPage() {
   const { toast } = useToast()

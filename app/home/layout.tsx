@@ -1,4 +1,4 @@
-import { CarouselEmbla } from './_components/carousel/CarouselEmbla'
+import { CartProvider } from '../context/CartContext'
 import { Footer } from './_components/Footer'
 import { Header } from './_components/Header'
 
@@ -17,7 +17,7 @@ export default function RootLayout({
     <div className="relative min-h-screen flex flex-col">
       <Header />
       <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {children}
+        <CartProvider>{children}</CartProvider>
       </main>
       <Footer />
     </div>

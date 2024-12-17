@@ -1,8 +1,8 @@
-import { SheetContent } from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
-import Link from 'next/link'
+import { SheetContent } from '@/components/ui/sheet'
 import { Instagram, MapPin, MessageCircle } from 'lucide-react'
+import Link from 'next/link'
 
 interface SideMenuContentProps {
   setIsSideMenuOpen: (value: boolean) => void
