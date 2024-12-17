@@ -1,23 +1,13 @@
 'use client'
+import { BannersCarousel } from '@/app/home/_components/BannersCarousel'
+import { SearchMenu } from '@/app/home/_components/SearchMenu'
+import { IProduct } from '@/types/IProduct'
 import { useState } from 'react'
-import { BannersCarousel } from './BannersCarousel'
-import { ProductItem } from './ProductItem'
-import { SearchMenu } from './SearchMenu'
+import ProductCard from './ProductCard'
 
-export interface SerializedProducts {
-  retailPrice: number
-  wholesalePrice: number
-  name: string
-  id: number
-  description: string
-  category: string
-  minQuantity: number
-  imageUrl: string
-  status: boolean
-  CreatedAt: Date
-}
+export type SerializedProducts = IProduct
 
-export function ProductList({ products }: { products: SerializedProducts[] }) {
+export default function ProductGrid({ products }: { products: IProduct[] }) {
   const [filteredProducts, setFilteredProducts] = useState<SerializedProducts[]>(products)
 
   const handleSelectCategory = (category: string) => {
@@ -44,9 +34,10 @@ export function ProductList({ products }: { products: SerializedProducts[] }) {
         handleSelectCategory={handleSelectCategory}
         handleChangeSearch={handleChangeSearch}
       />
-      <div className="grid grid-cols-2 mx-auto max-w-7xl mb-16 gap-2 sm:grid-cols-2 md:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
+
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6">
         {filteredProducts.map(product => (
-          <ProductItem key={product.id} {...product} />
+          <ProductCard key={product.id} product={product} />
         ))}
       </div>
     </div>

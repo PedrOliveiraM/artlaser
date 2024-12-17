@@ -1,13 +1,7 @@
 'use client'
 
 import { Card, CardContent } from '@/components/ui/card'
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from '@/components/ui/carousel'
+import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel'
 import { ApiResponse } from '@/utils/ApiResponse'
 import { Banner } from '@prisma/client'
 import Autoplay from 'embla-carousel-autoplay'
@@ -59,8 +53,6 @@ export function BannersCarousel() {
           </CarouselItem>
         ))}
       </CarouselContent>
-      <CarouselPrevious />
-      <CarouselNext />
     </Carousel>
   )
 }

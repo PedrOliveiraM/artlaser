@@ -1,10 +1,8 @@
 'use client'
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react'
+import { SerializedProducts } from '../home/_components/ProductGrid'
 
-import React, { createContext, useContext, useState, useEffect } from 'react'
-import { ProductItemProps } from '../home/_components/ProductItem'
-
-// Definir o formato do carrinho
-export type CartItem = ProductItemProps & {
+export type CartItem = SerializedProducts & {
   quantity: number
 }
 
@@ -12,6 +10,7 @@ interface CartContextType {
   cart: CartItem[]
   addToCart: (item: CartItem) => void
   removeFromCart: (id: number) => void
+  updateItemQuantity: (id: number, newQuantity: number) => void
   clearCart: () => void
 }
 
@@ -20,62 +19,62 @@ const CartContext = createContext<CartContextType | undefined>(undefined)
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [cart, setCart] = useState<CartItem[]>([])
 
-  // Carregar o carrinho do localStorage ao carregar a aplicação
+  // Recuperar do localStorage
   useEffect(() => {
-    const storedCart = localStorage.getItem('cart')
-    if (storedCart) {
-      setCart(JSON.parse(storedCart))
+    if (typeof window !== 'undefined') {
+      const storedCart = localStorage.getItem('cart')
+      try {
+        if (storedCart) setCart(JSON.parse(storedCart))
+      } catch (error) {
+        console.error('Erro ao recuperar o carrinho:', error)
+      }
     }
   }, [])
 
-  // Salvar o carrinho no localStorage sempre que ele for atualizado
+  // Salvar no localStorage
   useEffect(() => {
-    localStorage.setItem(
-      'cart',
-      JSON.stringify(
-        cart.map(item => ({
-          ...item,
-          retailPrice: item.retailPrice.toString(),
-          wholesalePrice: item.wholesalePrice.toString(),
-        }))
-      )
-    )
+    localStorage.setItem('cart', JSON.stringify(cart))
   }, [cart])
 
-  const addToCart = (item: CartItem) => {
+  const addToCart = useCallback((item: CartItem) => {
     setCart(prev => {
       const existingItem = prev.find(cartItem => cartItem.id === item.id)
       if (existingItem) {
         return prev.map(cartItem =>
           cartItem.id === item.id
-            ? { ...cartItem, minQuantity: cartItem.minQuantity + item.minQuantity }
+            ? { ...cartItem, quantity: cartItem.quantity + item.quantity }
             : cartItem
         )
       }
-      return [...prev, item]
+      return [...prev, { ...item, quantity: item.quantity || 1 }]
     })
-  }
+  }, [])
 
-  const removeFromCart = (id: number) => {
+  const updateItemQuantity = useCallback((id: number, newQuantity: number) => {
+    setCart(prev =>
+      prev.map(item => (item.id === id ? { ...item, quantity: newQuantity } : item))
+    )
+  }, [])
+
+  const removeFromCart = useCallback((id: number) => {
     setCart(prev => prev.filter(item => item.id !== id))
-  }
+  }, [])
 
-  const clearCart = () => {
-    setCart([])
-  }
+  const clearCart = useCallback(() => setCart([]), [])
 
   return (
-    <CartContext.Provider value={{ cart, addToCart, removeFromCart, clearCart }}>
+    <CartContext.Provider
+      value={{ cart, addToCart, updateItemQuantity, removeFromCart, clearCart }}
+    >
       {children}
     </CartContext.Provider>
   )
 }
 
-// Hook personalizado para usar o contexto
 export const useCart = () => {
   const context = useContext(CartContext)
   if (!context) {
-    throw new Error('useCart deve ser usado dentro de um CartProvider')
+    throw new Error('useCart deve ser usado dentro de um <CartProvider>')
   }
   return context
 }

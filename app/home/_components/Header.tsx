@@ -27,7 +27,7 @@ export function Header() {
             <SideMenuContent setIsSideMenuOpen={setIsSideMenuOpen} />
           </Sheet>
 
-          <Link href="/" className="mr-6 flex items-center space-x-2">
+          <Link href="/home" className="mr-6 flex items-center space-x-2">
             <Image src="/imagens/Logo.png" alt="Logo ArtLaser" width={150} height={50} />
           </Link>
         </div>

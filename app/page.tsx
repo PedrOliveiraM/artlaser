@@ -1,13 +1,7 @@
-import { SignIn } from '@/components/signin-button'
+import { redirect } from 'next/navigation'
 
 const Home = async () => {
-  return (
-    <>
-      <main className="w-full h-screen flex justify-center items-center">
-        <SignIn />
-      </main>
-    </>
-  )
+  redirect('/home')
 }
 
 export default Home

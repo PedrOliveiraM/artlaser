@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import Toast from '@/components/clientOnly'
 import SessionProvider from '@/providers/session'
+import { CartProvider } from './context/CartContext'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -22,9 +23,11 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body className={`${inter.className} antialiased`}>
-        <main>
-          <SessionProvider>{children}</SessionProvider>
-        </main>
+        <CartProvider>
+          <main>
+            <SessionProvider>{children}</SessionProvider>
+          </main>
+        </CartProvider>
         <Toast />
       </body>
     </html>

@@ -18,7 +18,7 @@ import {
 import { cn } from '@/lib/utils'
 import { Check, ChevronsUpDown, FilterX, Search } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { SerializedProducts } from './ProductList'
+import { SerializedProducts } from './ProductGrid'
 
 type CategoryOption = {
   value: string
@@ -73,10 +73,10 @@ export function SearchMenu({
       </div>
 
       <div className="col-span-1 sm:col-span-3 md:col-span-3">
-        <div className="flex justify-center items-center rounded-lg border-2 border-[#C8C8CC] px-5">
+        <div className="flex justify-center items-center rounded-lg border-2 border-[#C8C8CC] px-5 bg-orange-50">
           <input
             id="inputSearchProduct"
-            className="w-full h-10 rounded-l-lg border-0 outline-none px-2"
+            className="w-full h-10 rounded-l-lg border-0 outline-none px-2 bg-orange-50"
             type="text"
             placeholder="Procure pelo produto..."
             onChange={e => handleChangeSearch(e.target.value)}
@@ -139,7 +139,10 @@ export function SearchMenu({
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant={'destructive'} onClick={resetFilter}>
+                <Button
+                  className="bg-orange-500 hover:bg-orange-600"
+                  onClick={resetFilter}
+                >
                   <FilterX className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
