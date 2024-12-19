@@ -77,7 +77,10 @@ export default function ProductCard({ product }: ProductCardProps) {
               alt={product.name}
               fill
               className="object-cover rounded-md"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
+
+            
           </div>
           <div className="space-y-2">
             <h2 className="text-sm sm:text-base text-center font-semibold text-brown-800 line-clamp-2 h-10 sm:h-12">

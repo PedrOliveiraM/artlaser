@@ -1,10 +1,8 @@
-import { Button } from '@/components/ui/button'
+'use client'
 import { Separator } from '@/components/ui/separator'
-import { SheetContent } from '@/components/ui/sheet'
-import { Cat, Home, MapPin, MessageCircle, ShoppingCart } from 'lucide-react'
+import { SheetContent, SheetDescription, SheetTitle } from '@/components/ui/sheet'
 import Image from 'next/image'
-import Link from 'next/link'
-import { CiInstagram } from 'react-icons/ci'
+import { useEffect, useState } from 'react'
 import { Categories } from './Categories'
 import { Contacts } from './Contacts'
 import { Options } from './Options'
@@ -14,25 +12,48 @@ interface SideMenuContentProps {
 }
 
 export function SideMenuContent({ setIsSideMenuOpen }: SideMenuContentProps) {
-  const categories = ['Electronics', 'Clothing', 'Books', 'Home & Garden']
+  const [categories, setCategories] = useState<string[]>([])
+
+  useEffect(() => {
+    const listCategories = async () => {
+      try {
+        const response = await fetch('/api/products/categories')
+        const categories: string[] = await response.json()
+        setCategories(categories)
+      } catch (error) {
+        console.error('Erro ao buscar categorias:', error)
+      }
+    }
+
+    listCategories()
+  }, [])
 
   return (
     <SheetContent
       side="left"
       className="w-[300px] sm:w-[400px] flex flex-col overflow-y-auto"
     >
-      <header className="flex flex-col items-center justify-center px-4 py-5">
-        <Image src="/imagens/Logo.png" alt="Logo ArtLaser" width={150} height={50} />
-        <p className="text-sm text-center">
-          Transformando ideias em brindes e artes personalizadas
-        </p>
-      </header>
+      <SheetTitle>
+        <header className="flex flex-col items-center justify-center px-4 py-5">
+          <Image
+            src="/imagens/Logo.png"
+            alt="Logo ArtLaser"
+            width={150}
+            height={50}
+            priority
+          />
+        </header>
+      </SheetTitle>
+
+      <SheetDescription className="text-center text-black">
+        Transformando ideias em brindes e artes personalizadas
+      </SheetDescription>
 
       <Options setIsSideMenuOpen={setIsSideMenuOpen} />
 
       <Separator className="my-1" />
 
-      <Categories categories={categories} />
+      <Categories categories={categories} setIsSideMenuOpen={setIsSideMenuOpen} />
 
       <Separator className="my-1" />
 

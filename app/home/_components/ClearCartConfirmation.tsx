@@ -1,6 +1,5 @@
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -36,7 +35,6 @@ export function ClearCartConfirmation({ clearCart }: ClearCartConfirmationProps)
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancelar</AlertDialogCancel>
-
           <Button variant="destructive" onClick={clearCart}>
             Remover
           </Button>

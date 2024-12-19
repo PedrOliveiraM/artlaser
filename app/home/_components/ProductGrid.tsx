@@ -2,20 +2,31 @@
 import { BannersCarousel } from '@/app/home/_components/BannersCarousel'
 import { SearchMenu } from '@/app/home/_components/SearchMenu'
 import { IProduct } from '@/types/IProduct'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import ProductCard from './ProductCard'
+import { useCategoryContext } from '@/app/context/CategoryContext'
 
 export type SerializedProducts = IProduct
 
 export default function ProductGrid({ products }: { products: IProduct[] }) {
-  const [filteredProducts, setFilteredProducts] = useState<SerializedProducts[]>(products)
+  const { selectedCategory, setSelectedCategory } = useCategoryContext()
+  const [filteredProducts, setFilteredProducts] = useState<IProduct[]>(products)
 
-  const handleSelectCategory = (category: string) => {
-    if (!category) return setFilteredProducts(products)
-    setFilteredProducts(products.filter(product => product.category === category))
+  useEffect(() => {
+    if (!selectedCategory) {
+      setFilteredProducts(products)
+    } else {
+      setFilteredProducts(
+        products.filter(product => product.category === selectedCategory)
+      )
+    }
+  }, [selectedCategory, products])
+
+  const handleCategoryChange = (category: string) => {
+    setSelectedCategory(category)
   }
 
-  const handleChangeSearch = (search: string) => {
+  const handleSearchChange = (search: string) => {
     setFilteredProducts(
       products.filter(product =>
         product.name.toLowerCase().includes(search.toLowerCase())
@@ -29,11 +40,7 @@ export default function ProductGrid({ products }: { products: IProduct[] }) {
         <BannersCarousel />
       </div>
 
-      <SearchMenu
-        data={products}
-        handleSelectCategory={handleSelectCategory}
-        handleChangeSearch={handleChangeSearch}
-      />
+      <SearchMenu data={products} handleChangeSearch={handleSearchChange} />
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6">
         {filteredProducts.map(product => (

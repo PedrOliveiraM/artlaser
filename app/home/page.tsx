@@ -1,29 +1,34 @@
-// import { db } from '@/lib/prisma'
-// import { ProductList } from './_components/ProductList'
-
-// export default async function Home() {
-//   const products = await db.product.findMany({})
-
-//   const serializedProducts = products.map(product => ({
-//     ...product,
-//     retailPrice: product.retailPrice.toNumber(),
-//     wholesalePrice: product.wholesalePrice.toNumber(),
-//   }))
-
-//   return <ProductList products={serializedProducts} />
-// }
-
-import { db } from '@/lib/prisma'
-import { BannersCarousel } from '../home/_components/BannersCarousel'
+'use client'
+import { useToast } from '@/hooks/use-toast'
+import { Product } from '@prisma/client'
+import { useEffect, useState } from 'react'
 import ProductGrid from './_components/ProductGrid'
 
-export default async function Home() {
-  const products = await db.product.findMany({})
+export default function Home() {
+  const [products, setProducts] = useState<Product[]>([])
+  const { toast } = useToast()
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch('/api/products')
+        const products = await response.json()
+        setProducts(products)
+      } catch (error) {
+        toast({
+          title: 'Erro ao buscar produtos',
+          description: 'Tente novamente mais tarde',
+        })
+      }
+    }
+
+    fetchProducts()
+  }, [])
 
   const serializedProducts = products.map(product => ({
     ...product,
-    retailPrice: product.retailPrice.toNumber(),
-    wholesalePrice: product.wholesalePrice.toNumber(),
+    retailPrice: parseFloat(product.retailPrice.toString()),
+    wholesalePrice: parseFloat(product.wholesalePrice.toString()),
   }))
 
   return (

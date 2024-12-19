@@ -46,6 +46,7 @@ export function BannersCarousel() {
                     alt={banner.name}
                     width={1280}
                     height={300}
+                    priority={true}
                   />
                 </CardContent>
               </Card>

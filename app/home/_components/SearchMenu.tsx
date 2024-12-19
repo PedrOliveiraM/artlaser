@@ -19,6 +19,7 @@ import { cn } from '@/lib/utils'
 import { Check, ChevronsUpDown, FilterX, Search } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { SerializedProducts } from './ProductGrid'
+import { useCategoryContext } from '@/app/context/CategoryContext'
 
 type CategoryOption = {
   value: string
@@ -27,17 +28,12 @@ type CategoryOption = {
 
 interface SearchMenuProps {
   data: SerializedProducts[]
-  handleSelectCategory: (category: string) => void
   handleChangeSearch: (search: string) => void
 }
 
-export function SearchMenu({
-  data,
-  handleSelectCategory,
-  handleChangeSearch,
-}: SearchMenuProps) {
+export function SearchMenu({ data, handleChangeSearch }: SearchMenuProps) {
+  const { selectedCategory, setSelectedCategory } = useCategoryContext() // Contexto de categorias
   const [open, setOpen] = useState(false)
-  const [value, setValue] = useState('')
   const [categories, setCategories] = useState<CategoryOption[]>([])
 
   useEffect(() => {
@@ -59,11 +55,10 @@ export function SearchMenu({
     }
 
     listCategories()
-  }, [])
+  }, [data])
 
   const resetFilter = () => {
-    setValue('')
-    handleSelectCategory('')
+    setSelectedCategory('') // Reseta a categoria no contexto
   }
 
   return (
@@ -100,8 +95,9 @@ export function SearchMenu({
                 aria-expanded={open}
                 className="w-[200px] justify-between"
               >
-                {value
-                  ? categories.find(category => category.value === value)?.label
+                {selectedCategory
+                  ? categories.find(category => category.value === selectedCategory)
+                      ?.label
                   : 'Mostrar por...'}
                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
@@ -117,15 +113,18 @@ export function SearchMenu({
                         key={category.value}
                         value={category.value}
                         onSelect={currentValue => {
-                          setValue(currentValue === value ? '' : currentValue)
-                          handleSelectCategory(currentValue)
+                          setSelectedCategory(
+                            currentValue === selectedCategory ? '' : currentValue
+                          ) // Atualiza a categoria no contexto
                           setOpen(false)
                         }}
                       >
                         <Check
                           className={cn(
                             'mr-2 h-4 w-4',
-                            value === category.value ? 'opacity-100' : 'opacity-0'
+                            selectedCategory === category.value
+                              ? 'opacity-100'
+                              : 'opacity-0'
                           )}
                         />
                         {category.label}

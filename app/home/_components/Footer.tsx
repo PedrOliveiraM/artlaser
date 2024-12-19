@@ -8,7 +8,6 @@ export function Footer() {
   return (
     <footer className="bg-orange-400 text-black">
       <div className="container mx-auto px-4 py-8">
-
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Logo e descrição */}
           <div className="flex flex-col justify-center items-center">
@@ -18,6 +17,7 @@ export function Footer() {
                 alt="Logo ArtLaser"
                 width={160}
                 height={60}
+                priority
               />
             </Link>
             <p className="text-base text-center">
