@@ -63,12 +63,12 @@ export function SearchMenu({ data, handleChangeSearch }: SearchMenuProps) {
 
   return (
     <div className="grid w-full gap-4 py-2 sm:grid-cols-6 md:grid-cols-6 xl:grid-cols-6 xl:px-24">
-      <div className="col-span-1 sm:col-span-1 md:col-span-1">
+      <div className="col-span-1 sm:col-span-1 md:col-span-1 flex items-center">
         <h1 className="font-bold text-xl">Nossos Produtos</h1>
       </div>
 
       <div className="col-span-1 sm:col-span-3 md:col-span-3">
-        <div className="flex justify-center items-center rounded-lg border-2 border-[#C8C8CC] px-5 bg-orange-50">
+        <div className="flex justify-center items-center rounded-lg border-2 md:max-w-72 lg:max-w-full border-[#C8C8CC] px-5 bg-orange-50">
           <input
             id="inputSearchProduct"
             className="w-full h-10 rounded-l-lg border-0 outline-none px-2 bg-orange-50"
@@ -93,7 +93,7 @@ export function SearchMenu({ data, handleChangeSearch }: SearchMenuProps) {
               <Button
                 variant="default"
                 aria-expanded={open}
-                className="w-[200px] justify-between"
+                className="justify-between w-full"
               >
                 {selectedCategory
                   ? categories.find(category => category.value === selectedCategory)

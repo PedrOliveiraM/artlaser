@@ -36,7 +36,7 @@ export default function Home() {
   return (
     <main className="min-h-screen">
       <BannersCarousel />
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 md:py-4">
         <ProductGrid products={serializedProducts} />
         <WhatsappButton />
       </div>
