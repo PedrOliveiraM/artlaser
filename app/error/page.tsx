@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
@@ -19,8 +20,25 @@ const errorMap = {
 }
 
 export default function AuthErrorPage() {
-  const search = useSearchParams()
-  const error = search.get('error') as EError
+  const [error, setError] = useState<EError | null>(null)
+  const [isClient, setIsClient] = useState(false)
+
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+
+ 
+  useEffect(() => {
+    if (isClient) {
+      const search = useSearchParams()
+      const errorParam = search.get('error') as EError | ''
+      setError(errorParam || null) 
+    }
+  }, [isClient])
+
+  if (!isClient) {
+    return <div>Carregando...</div>
+  }
 
   return (
     <div className="flex h-screen w-full flex-col items-center justify-center">
@@ -29,7 +47,7 @@ export default function AuthErrorPage() {
           Algo deu errado
         </h5>
         <div className="font-normal text-gray-700 dark:text-gray-400">
-          {errorMap[error] || 'Entre em contato conosco se o erro persistir.'}
+          {error ? errorMap[error] : 'Entre em contato conosco se o erro persistir.'}
         </div>
         <Button type="button" asChild>
           <Link href={'/'}>Página Inicial</Link>

@@ -10,7 +10,7 @@ export async function POST(request: Request) {
   try {
     const body = await request.json()
 
-    const { username, email, password } = userSchema.parse(body)
+    const {username, email, password } = userSchema.parse(body)
 
     if (!email || !password) {
       return NextResponse.json<ApiResponse<User>>({
