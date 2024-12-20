@@ -25,12 +25,12 @@ export function BannersCarousel() {
     fetchBanners()
   }, [])
 
-  const plugin = useRef(Autoplay({ delay: 10000, stopOnInteraction: true }))
+  const plugin = useRef(Autoplay({ delay: 6000, stopOnInteraction: true }))
 
   return (
     <Carousel
       plugins={[plugin.current]}
-      className="w-full max-w-7xl mx-auto"
+      className="w-full"
       onMouseEnter={plugin.current.stop}
       onMouseLeave={plugin.current.reset}
     >
@@ -44,8 +44,8 @@ export function BannersCarousel() {
                     className="rounded-sm"
                     src={banner.imageUrl}
                     alt={banner.name}
-                    width={1280}
-                    height={300}
+                    width={1480}
+                    height={400}
                     priority={true}
                   />
                 </CardContent>

@@ -3,6 +3,7 @@ import { useToast } from '@/hooks/use-toast'
 import { Product } from '@prisma/client'
 import { useEffect, useState } from 'react'
 import ProductGrid from './_components/ProductGrid'
+import { BannersCarousel } from './_components/BannersCarousel'
 
 export default function Home() {
   const [products, setProducts] = useState<Product[]>([])
@@ -33,6 +34,7 @@ export default function Home() {
 
   return (
     <main className="min-h-screen">
+      <BannersCarousel />
       <div className="container mx-auto px-4 py-8">
         <ProductGrid products={serializedProducts} />
       </div>

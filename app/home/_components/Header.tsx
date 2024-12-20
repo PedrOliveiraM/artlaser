@@ -11,7 +11,7 @@ export function Header() {
   const [isSideMenuOpen, setIsSideMenuOpen] = useState(false)
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 w-full border-b bg-orange-400 backdrop-blur supports-[backdrop-filter]:bg-orange-400">
       <div className="flex justify-between items-center px-5 py-2">
         <div className="flex gap-3">
           <Sheet open={isSideMenuOpen} onOpenChange={setIsSideMenuOpen}>
