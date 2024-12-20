@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button'
-import { Home, ShoppingCart, UserCog } from 'lucide-react'
+import { Gift, ShoppingCart, UserCog } from 'lucide-react'
 import Link from 'next/link'
 
 interface OptionsProps {
@@ -15,8 +15,8 @@ export function Options({ setIsSideMenuOpen }: OptionsProps) {
           className="text-sm font-medium transition-colors hover:text-primary "
           onClick={() => setIsSideMenuOpen(false)}
         >
-          <Home className="h-5 w-5" />
-          Home
+          <Gift className="h-5 w-5" />
+          Produtos
         </Link>
       </Button>
 

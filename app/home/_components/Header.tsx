@@ -4,11 +4,14 @@ import { Sheet, SheetTrigger } from '@/components/ui/sheet'
 import { Menu, ShoppingCart } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { SideMenuContent } from './SideMenuContent'
+import { useCart } from '@/app/context/CartContext'
 
 export function Header() {
   const [isSideMenuOpen, setIsSideMenuOpen] = useState(false)
+  const { cart } = useCart()
+  const productsQuantity = cart.reduce((acc, item) => acc + item.quantity, 0)
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-orange-400 backdrop-blur supports-[backdrop-filter]:bg-orange-400">
@@ -39,6 +42,9 @@ export function Header() {
         </div>
 
         <Link href="/home/cart" className="relative transition-colors hover:text-primary">
+          <div className="absolute -top-2 -right-2 bg-black text-white text-xs w-4 h-4 flex items-center justify-center rounded-full">
+            {productsQuantity}
+          </div>
           <ShoppingCart className="h-6 w-6" strokeWidth={3} />
         </Link>
       </div>

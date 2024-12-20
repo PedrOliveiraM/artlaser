@@ -7,10 +7,10 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import AddToCartNotification from './AddToCartNotification'
-import { SerializedProducts } from './ProductGrid'
+import { IProduct } from '@/types/IProduct'
 
 interface ProductCardProps {
-  product: SerializedProducts
+  product: IProduct
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
@@ -27,14 +27,7 @@ export default function ProductCard({ product }: ProductCardProps) {
   const onGoToCart = () => router.push('/home/cart')
 
   function handleAddToCart() {
-    if (!quantity || quantity <= 0) {
-      toast({
-        title: 'Opaa!',
-        description: 'Selecione uma quantidade válida para adicionar ao carrinho',
-      })
-      return
-    }
-
+    const adjustedQuantity = quantity || 1
     try {
       addToCart({
         id: product.id,
@@ -47,7 +40,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         status: product.status,
         CreatedAt: product.CreatedAt,
         minQuantity: product.minQuantity,
-        quantity,
+        quantity: adjustedQuantity,
       })
 
       setQuantity(0)
@@ -79,8 +72,6 @@ export default function ProductCard({ product }: ProductCardProps) {
               className="object-cover rounded-md"
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
-
-            
           </div>
           <div className="space-y-2">
             <h2 className="text-sm sm:text-base text-center font-semibold text-brown-800 line-clamp-2 h-10 sm:h-12">

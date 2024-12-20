@@ -18,8 +18,8 @@ import {
 import { cn } from '@/lib/utils'
 import { Check, ChevronsUpDown, FilterX, Search } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { SerializedProducts } from './ProductGrid'
 import { useCategoryContext } from '@/app/context/CategoryContext'
+import { IProduct } from '@/types/IProduct'
 
 type CategoryOption = {
   value: string
@@ -27,7 +27,7 @@ type CategoryOption = {
 }
 
 interface SearchMenuProps {
-  data: SerializedProducts[]
+  data: IProduct[]
   handleChangeSearch: (search: string) => void
 }
 
@@ -143,6 +143,7 @@ export function SearchMenu({ data, handleChangeSearch }: SearchMenuProps) {
                   onClick={resetFilter}
                 >
                   <FilterX className="h-4 w-4" />
+                  Limpar
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
