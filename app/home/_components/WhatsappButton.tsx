@@ -4,15 +4,12 @@ import { IoLogoWhatsapp } from 'react-icons/io'
 
 export function WhatsappButton() {
   const redirectToWhatsApp = () => {
-
-    const phoneNumber = '+556298092832'
-    const message = encodeURIComponent(
-      'Olá! Gostaria de mais informações'
-    )
+    const phoneNumber = '+5577988438467'
+    const message = encodeURIComponent('Olá! Gostaria de mais informações')
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`
     window.open(whatsappUrl, '_blank')
   }
-  
+
   return (
     <div className="fixed bottom-4 right-4 z-50">
       <Button
