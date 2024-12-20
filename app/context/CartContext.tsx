@@ -41,9 +41,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const existingItem = prev.find(cartItem => cartItem.id === item.id)
       if (existingItem) {
         return prev.map(cartItem =>
-          cartItem.id === item.id
-            ? { ...cartItem, quantity: cartItem.quantity + item.quantity }
-            : cartItem
+          cartItem.id === item.id ? { ...cartItem, quantity: item.quantity } : cartItem
         )
       }
       return [...prev, { ...item, quantity: item.quantity || 1 }]

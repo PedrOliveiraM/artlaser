@@ -43,7 +43,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         quantity: adjustedQuantity,
       })
 
-      setQuantity(0)
+      setQuantity(adjustedQuantity)
       setIsNotificationOpen(true)
     } catch (error) {
       setIsNotificationOpen(false)
