@@ -1,8 +1,8 @@
 'use client'
+import { ICartItem } from '@/types/ICardItem'
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react'
-import { SerializedProducts } from '../home/_components/ProductGrid'
 
-export type CartItem = SerializedProducts & {
+export type CartItem = ICartItem & {
   quantity: number
 }
 

@@ -1,4 +1,5 @@
 'use client'
+import { useCart } from '@/app/context/CartContext'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,6 +19,21 @@ interface CartFooterProps {
 }
 
 export function CartFooter({ calculateSaved, calculateTotal }: CartFooterProps) {
+  const { cart } = useCart()
+
+  const handleFinishCheckout = () => {
+    const products = cart.map(item => item.name).join(', ')
+
+    console.log('Produtos:', products)
+
+    const phoneNumber = '+556298092832'
+    const message = encodeURIComponent(
+      `Olá! Gostaria de mais informações sobre esses produtos: ${products}.`
+    )
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`
+    window.open(whatsappUrl, '_blank')
+  }
+
   return (
     <div className="mt-8 text-right">
       <p className="text-2xl font-bold text-brown-800">
@@ -44,7 +60,10 @@ export function CartFooter({ calculateSaved, calculateTotal }: CartFooterProps) 
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction asChild>
-              <Button className="mt-4 bg-orange-500 hover:bg-orange-600 text-white">
+              <Button
+                className="bg-orange-500 hover:bg-orange-600 text-white"
+                onClick={handleFinishCheckout}
+              >
                 Continuar
               </Button>
             </AlertDialogAction>
