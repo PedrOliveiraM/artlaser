@@ -4,6 +4,7 @@ import { Product } from '@prisma/client'
 import { useEffect, useState } from 'react'
 import ProductGrid from './_components/ProductGrid'
 import { BannersCarousel } from './_components/BannersCarousel'
+import { WhatsappButton } from './_components/WhatsappButton'
 
 export default function Home() {
   const [products, setProducts] = useState<Product[]>([])
@@ -37,6 +38,7 @@ export default function Home() {
       <BannersCarousel />
       <div className="container mx-auto px-4 py-8">
         <ProductGrid products={serializedProducts} />
+        <WhatsappButton />
       </div>
     </main>
   )
