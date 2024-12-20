@@ -9,6 +9,7 @@
     "init": "next dev -H 0.0.0.0",
     "lint": "next lint",
     "prepare": "husky",
+    "prepare:prisma": "prisma generate",
     "seed": "ts-node --transpile-only prisma/seed.ts"
   },
   "dependencies": {
