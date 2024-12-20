@@ -30,17 +30,6 @@ export function Options({ setIsSideMenuOpen }: OptionsProps) {
           Carrinho
         </Link>
       </Button>
-
-      <Button variant={'link'} asChild className="flex justify-start">
-        <Link
-          href="/signin"
-          className="text-sm font-medium transition-colors hover:text-primary flex gap-2 items-center"
-          onClick={() => setIsSideMenuOpen(false)}
-        >
-          <UserCog className="h-5 w-5" />
-          Administração
-        </Link>
-      </Button>
     </nav>
   )
 }
