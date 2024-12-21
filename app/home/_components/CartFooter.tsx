@@ -26,7 +26,7 @@ export function CartFooter({ calculateSaved, calculateTotal }: CartFooterProps) 
 
     console.log('Produtos:', products)
 
-    const phoneNumber = '+556298092832'
+    const phoneNumber = '+557788438467'
     const message = encodeURIComponent(
       `Olá! Gostaria de mais informações sobre esses produtos: ${products}.`
     )

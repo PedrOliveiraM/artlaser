@@ -1,5 +1,6 @@
 'use client'
 
+import Loading from '@/components/loading'
 import { Card, CardContent } from '@/components/ui/card'
 import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel'
 import { ApiResponse } from '@/utils/ApiResponse'
@@ -10,14 +11,17 @@ import { useEffect, useRef, useState } from 'react'
 
 export function BannersCarousel() {
   const [banners, setBanners] = useState<Banner[]>([])
-
+  const [isLoading, setIsLoading] = useState(true)
   useEffect(() => {
     const fetchBanners = async () => {
       try {
+        setIsLoading(true)
         const response = await fetch('/api/banners')
         const data: ApiResponse<Banner[]> = await response.json()
         setBanners(data.data || [])
+        setIsLoading(false)
       } catch (error) {
+        setIsLoading(false)
         console.error('Error fetching banners:', error)
       }
     }
@@ -26,6 +30,8 @@ export function BannersCarousel() {
   }, [])
 
   const plugin = useRef(Autoplay({ delay: 6000, stopOnInteraction: true }))
+
+  if (isLoading) return <Loading />
 
   return (
     <Carousel
