@@ -8,6 +8,8 @@ import { WhatsappButton } from './_components/WhatsappButton'
 
 export default function Home() {
   const [products, setProducts] = useState<Product[]>([])
+  const [isLoaded, setIsLoaded] = useState(true)
+
   const { toast } = useToast()
 
   useEffect(() => {
@@ -16,7 +18,9 @@ export default function Home() {
         const response = await fetch('/api/products')
         const products = await response.json()
         setProducts(products)
+        setIsLoaded(false)
       } catch (error) {
+        setIsLoaded(false)
         toast({
           title: 'Erro ao buscar produtos',
           description: 'Tente novamente mais tarde',

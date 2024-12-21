@@ -1,7 +1,9 @@
 'use client'
 
+import Loading from '@/components/loading'
 import { Card, CardContent } from '@/components/ui/card'
 import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel'
+import { useToast } from '@/hooks/use-toast'
 import { ApiResponse } from '@/utils/ApiResponse'
 import { Banner } from '@prisma/client'
 import Autoplay from 'embla-carousel-autoplay'
@@ -10,6 +12,9 @@ import { useEffect, useRef, useState } from 'react'
 
 export function BannersCarousel() {
   const [banners, setBanners] = useState<Banner[]>([])
+  const [isLoaded, setIsLoaded] = useState(true)
+
+  const { toast } = useToast()
 
   useEffect(() => {
     const fetchBanners = async () => {
@@ -17,8 +22,13 @@ export function BannersCarousel() {
         const response = await fetch('/api/banners')
         const data: ApiResponse<Banner[]> = await response.json()
         setBanners(data.data || [])
+        setIsLoaded(false)
       } catch (error) {
-        console.error('Error fetching banners:', error)
+        toast({
+          title: 'Erro ao buscar banners',
+          description: 'Tente novamente mais tarde',
+        })
+        setIsLoaded(false)
       }
     }
 
@@ -26,6 +36,8 @@ export function BannersCarousel() {
   }, [])
 
   const plugin = useRef(Autoplay({ delay: 6000, stopOnInteraction: true }))
+
+  if (isLoaded) return <Loading />
 
   return (
     <Carousel
