@@ -19,11 +19,8 @@ export default function SettingsPage() {
     return null
   }
 
-  // Verifique o conteúdo da sessão para garantir que o id está sendo passado corretamente
-  console.log('Session data:', session)
-
   const defaultValues = {
-    id: session?.user?.id || '', // Garantindo que id seja um valor válido
+    id: session?.user?.id || '', 
     username: session?.user?.name || '',
     email: session?.user?.email || '',
     password: '',
@@ -31,8 +28,6 @@ export default function SettingsPage() {
     confirmNewPassword: '',
   }
 
-  // Verifique os valores default para ver se o id está correto
-  console.log('Default values:', defaultValues)
 
   return <SettingsForm {...defaultValues} />
 }

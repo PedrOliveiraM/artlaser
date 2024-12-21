@@ -20,7 +20,6 @@ export const BannerColumns = (fetchData: () => void): ColumnDef<BannerData>[] =>
     cell: ({ row }) => {
       const imageUrl = row.getValue('imageUrl') as string
       if (!imageUrl) return ' '
-      console.log(imageUrl)
       return (
         <div className="flex items-center justify-center">
           <Image

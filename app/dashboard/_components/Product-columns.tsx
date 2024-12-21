@@ -25,7 +25,6 @@ export const Productcolumns = (fetchData: () => void): ColumnDef<ProductData>[] 
     cell: ({ row }) => {
       const imageUrl = row.getValue('imageUrl') as string
       if (!imageUrl) return ' '
-      console.log(imageUrl)
       return (
         <div className="flex items-center">
           <Image

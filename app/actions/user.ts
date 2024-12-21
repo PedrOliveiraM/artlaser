@@ -10,7 +10,6 @@ const login = async (formData: FormData): Promise<void> => {
   const password = formData.get('password') as string | null
 
   if (!email || !password) {
-    console.log('Email e senha são obrigatórios.')
     return
   }
 
@@ -25,10 +24,8 @@ const login = async (formData: FormData): Promise<void> => {
   } catch (error) {
     if (error instanceof CredentialsSignin) {
       console.error('Erro de autenticação:', error)
-      console.log('Senha Inválida')
     } else {
       console.error('Erro inesperado:', error)
-      console.log('Algo deu errado. Tente novamente.')
     }
   }
 }

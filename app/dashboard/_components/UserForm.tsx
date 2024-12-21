@@ -52,12 +52,10 @@ export function UserForm({ id, username, email }: IUserProps) {
 
   async function onSubmit(values: z.infer<typeof formUserSchema>) {
     try {
-      // ID do usuário (você pode adaptar isso conforme a sua lógica para obter o ID)
       const userId = id
 
-      // Requisição para a API
       const response = await fetch(`/api/users/${userId}`, {
-        method: 'PUT', // ou POST se for compatível com a rota
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -69,7 +67,6 @@ export function UserForm({ id, username, email }: IUserProps) {
         }),
       })
 
-      // Manipulando a resposta da API
       const data = await response.json()
 
       if (!response.ok) {
@@ -77,7 +74,7 @@ export function UserForm({ id, username, email }: IUserProps) {
       }
 
       alert('Usuário atualizado com sucesso!')
-      console.log('Resposta da API:', data)
+
     } catch (error) {
       console.error('Erro ao enviar dados:', error as string)
       alert(`Erro: ${error as string}`)

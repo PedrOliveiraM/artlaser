@@ -24,8 +24,6 @@ export function CartFooter({ calculateSaved, calculateTotal }: CartFooterProps) 
   const handleFinishCheckout = () => {
     const products = cart.map(item => item.name).join(', ')
 
-    console.log('Produtos:', products)
-
     const phoneNumber = '+5577988438467'
     const message = encodeURIComponent(
       `Olá! Gostaria de mais informações sobre esses produtos: ${products}.`

@@ -11,7 +11,6 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    console.log('DATA RECEBIDA : ', body)
 
     const createdProduct = await db.product.create({
       data: body,

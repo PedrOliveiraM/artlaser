@@ -114,7 +114,6 @@ export default function BannerFormTemplate({
       setUploading(true)
 
       let imageUrl = data?.imageUrl
-      console.log('Imagem', image)
       if (image) {
         if (data?.imageUrl) {
           const deleteSuccess = await deleteImageFromBlob(data.imageUrl)
