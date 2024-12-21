@@ -14,6 +14,9 @@ export const metadata = {
   themeColor: '#8B4513',
   viewport: 'width=device-width, initial-scale=1.0',
   language: 'pt-BR',
+  icons: {
+    icon: '/Logo-artlaser-simple.ico',
+  },
 }
 
 export default function RootLayout({
