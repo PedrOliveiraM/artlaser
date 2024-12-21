@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import ProductGrid from './_components/ProductGrid'
 import { BannersCarousel } from './_components/BannersCarousel'
 import { WhatsappButton } from './_components/WhatsappButton'
+import { SkeletonHomePage } from './_components/SkeletonHomePage'
 
 export default function Home() {
   const [products, setProducts] = useState<Product[]>([])
@@ -36,6 +37,8 @@ export default function Home() {
     retailPrice: parseFloat(product.retailPrice.toString()),
     wholesalePrice: parseFloat(product.wholesalePrice.toString()),
   }))
+
+  if (isLoaded) return <SkeletonHomePage />
 
   return (
     <main className="min-h-screen">

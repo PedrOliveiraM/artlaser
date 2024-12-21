@@ -12,7 +12,6 @@ export default function ProductGrid({ products }: { products: IProduct[] }) {
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 10
 
-  // Filtro por categoria
   useEffect(() => {
     if (!selectedCategory) {
       setFilteredProducts(products)
@@ -21,27 +20,23 @@ export default function ProductGrid({ products }: { products: IProduct[] }) {
         products.filter(product => product.category === selectedCategory)
       )
     }
-    setCurrentPage(1) // Reseta para a primeira página ao mudar o filtro
+    setCurrentPage(1) 
   }, [selectedCategory, products])
 
-  // Função para manipular busca
   const handleSearchChange = (search: string) => {
     setFilteredProducts(
       products.filter(product =>
         product.name.toLowerCase().includes(search.toLowerCase())
       )
     )
-    setCurrentPage(1) // Reseta para a primeira página ao realizar busca
+    setCurrentPage(1) 
   }
 
-  // Produtos da página atual
   const startIndex = (currentPage - 1) * itemsPerPage
   const currentProducts = filteredProducts.slice(startIndex, startIndex + itemsPerPage)
 
-  // Total de páginas
   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage)
 
-  // Funções para mudar de página
   const handleNextPage = () => {
     if (currentPage < totalPages) setCurrentPage(currentPage + 1)
   }
@@ -60,7 +55,6 @@ export default function ProductGrid({ products }: { products: IProduct[] }) {
         ))}
       </div>
 
-      {/* Paginação */}
       <div className="flex justify-center items-center mt-6">
         <Button onClick={handlePrevPage} disabled={currentPage === 1}>
           Anterior

@@ -1,6 +1,4 @@
 'use client'
-
-import Loading from '@/components/loading'
 import { Card, CardContent } from '@/components/ui/card'
 import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel'
 import { useToast } from '@/hooks/use-toast'
@@ -9,6 +7,7 @@ import { Banner } from '@prisma/client'
 import Autoplay from 'embla-carousel-autoplay'
 import Image from 'next/image'
 import { useEffect, useRef, useState } from 'react'
+import { SkeletonHomePage } from './SkeletonHomePage'
 
 export function BannersCarousel() {
   const [banners, setBanners] = useState<Banner[]>([])
@@ -37,7 +36,7 @@ export function BannersCarousel() {
 
   const plugin = useRef(Autoplay({ delay: 6000, stopOnInteraction: true }))
 
-  if (isLoaded) return <Loading />
+  if (isLoaded) return <SkeletonHomePage />
 
   return (
     <Carousel
