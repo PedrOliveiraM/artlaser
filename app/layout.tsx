@@ -21,7 +21,7 @@ export const metadata = {
   viewport: 'width=device-width, initial-scale=1.0',
   language: 'pt-BR',
   icons: {
-    icon: '/Logo-artlaser-simple.ico',
+    icon: '/Artlaser-favicon.ico',
   },
 }
 
