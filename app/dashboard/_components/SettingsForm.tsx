@@ -1,5 +1,6 @@
 'use client'
 import { UserDto } from '@/app/api/users/[id]/route'
+import Loading from '@/components/loading'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -28,7 +29,7 @@ import { signOut } from 'next-auth/react'
 import Link from 'next/link'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { z } from 'zod'
+import { set, z } from 'zod'
 
 interface IDefaultValues {
   id: string
@@ -41,6 +42,7 @@ interface IDefaultValues {
 export default function SettingsForm(defaultValues: IDefaultValues) {
   const { toast } = useToast()
   const [checked, setChecked] = useState<CheckedState>(false)
+  const [isLoaded, setIsLoaded] = useState(false)
 
   const formSchema = settingsSchema
 
@@ -54,22 +56,25 @@ export default function SettingsForm(defaultValues: IDefaultValues) {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
+      setIsLoaded(true)
       const response = await fetch(`/api/users/${defaultValues.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          email: values.email,
+          checked: checked,
+          username: values.username,
           password: values.password,
           newPassword: values.newPassword,
-          username: values.username,
-          email: values.email,
         }),
       })
 
       const data: ApiResponse<UserDto> = await response.json()
 
       if (response.ok) {
+        setIsLoaded(false)
         toast({
           title: 'Usuário atualizado com sucesso',
           variant: 'success',
@@ -78,6 +83,7 @@ export default function SettingsForm(defaultValues: IDefaultValues) {
           redirectTo: '/signIn',
         })
       } else {
+        setIsLoaded(false)
         toast({
           title: 'Erro ao atualizar usuário',
           description: data.message,
@@ -95,6 +101,8 @@ export default function SettingsForm(defaultValues: IDefaultValues) {
     }
   }
 
+  if (isLoaded) return <Loading />
+  
   return (
     <div className="container mx-auto px-4 py-10 md:max-w-2xl">
       <h1 className="text-4xl font-bold text-center mb-8 text-primary">

@@ -27,7 +27,6 @@ export async function PUT(
     const parsedId = parseInt(id)
     const body = await request.json()
 
-    // Ajustar o esquema para refletir a estrutura real do corpo da requisição
     const parsedBody = settingsSchema.parse(body)
 
     // Buscar usuário no banco de dados

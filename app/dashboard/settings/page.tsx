@@ -20,14 +20,13 @@ export default function SettingsPage() {
   }
 
   const defaultValues = {
-    id: session?.user?.id || '', 
+    id: session?.user?.id || '',
     username: session?.user?.name || '',
     email: session?.user?.email || '',
     password: '',
     newPassword: '',
-    confirmNewPassword: '',
+    confirmPassword: '',
   }
-
 
   return <SettingsForm {...defaultValues} />
 }
