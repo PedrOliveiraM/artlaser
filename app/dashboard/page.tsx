@@ -15,7 +15,7 @@ export default function Administrator() {
   }
 
   if (!session) {
-    router.push('/signin') // Redireciona para login
+    router.push('/signIn') // Redireciona para login
     return null
   }
 

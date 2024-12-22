@@ -9,7 +9,7 @@ export function SignOut() {
       type="button"
       onClick={() =>
         signOut({
-          redirectTo: '/signin',
+          redirectTo: '/signIn',
         })
       }
     >

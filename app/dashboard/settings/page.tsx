@@ -15,7 +15,7 @@ export default function SettingsPage() {
   }
 
   if (!session) {
-    router.push('/signin')
+    router.push('/signIn')
     return null
   }
 

@@ -20,12 +20,7 @@ export const createUserSchema = z.object({
 })
 
 export const userSchema = z.object({
-  username: z
-  .string()
-  .min(6, {
-    message: 'Deve ter pelo menos 6 caracteres',
-  })
-  .trim(),
+  username: z.string().optional(),
   email: z.string().trim().email({ message: 'Email inválido' }),
   password: z.string().trim().min(6, {
     message: 'Deve ter pelo menos 6 caracteres',

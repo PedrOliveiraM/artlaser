@@ -5,7 +5,7 @@ import { Button } from './ui/button'
 export function SignIn() {
   return (
     <Button type="button" asChild>
-      <Link href={'/signin'}>Sign In</Link>
+      <Link href={'/signIn'}>Sign In</Link>
     </Button>
   )
 }

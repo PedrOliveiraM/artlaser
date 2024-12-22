@@ -1,13 +1,16 @@
-import 'dotenv/config'
-import { MailerSend, EmailParams, Sender, Recipient } from 'mailersend'
+import { EmailParams, MailerSend, Recipient, Sender } from 'mailersend'
+
+if (!process.env.MAILERSEND_API_TOKEN) {
+  throw new Error('MAILERSEND_API_TOKEN não configurado nas variáveis de ambiente.')
+}
 
 const mailerSend = new MailerSend({
   apiKey: process.env.MAILERSEND_API_TOKEN as string,
 })
 
-const sentFrom = new Sender('you@yourdomain.com', 'Your Company')
+const sentFrom = new Sender('MS_8kGkZ4@trial-0p7kx4xy8jml9yjr.mlsender.net', 'Artlaser')
+const currentYear = new Date().getFullYear()
 
-// Função para enviar email de recuperação de senha
 export async function sendPasswordRecoveryEmail(
   recipientEmail: string,
   recipientName: string,
@@ -22,7 +25,7 @@ export async function sendPasswordRecoveryEmail(
     .setSubject('Recuperação de senha')
     .setHtml(`
       <html>
-        <body style="font-family: Arial, sans-serif; background-color: #f4f4f9; margin: 0; padding: 0;">
+        <body style="font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f4f4f9;">
           <table align="center" width="600" style="background-color: #ffffff; padding: 20px; border-radius: 10px; border: 1px solid #ddd;">
             <tr>
               <td style="text-align: center; padding: 20px;">
@@ -31,12 +34,12 @@ export async function sendPasswordRecoveryEmail(
                 <p style="font-size: 16px; color: #666;">Aqui está sua senha temporária:</p>
                 <p style="font-size: 20px; color: #000; font-weight: bold;">${temporaryPassword}</p>
                 <p style="font-size: 14px; color: #999;">Recomendamos que você altere sua senha assim que fizer login.</p>
-                <a href="https://yourdomain.com/reset-password" style="display: inline-block; margin-top: 20px; padding: 10px 20px; background-color: #007BFF; color: #fff; text-decoration: none; border-radius: 5px;">Alterar minha senha</a>
+                <a href="https://yourdomain.com/reset-password" target="_blank" style="display: inline-block; margin-top: 20px; padding: 10px 20px; background-color: #007BFF; color: #fff; text-decoration: none; border-radius: 5px;">Alterar minha senha</a>
               </td>
             </tr>
             <tr>
               <td style="text-align: center; padding: 10px; font-size: 12px; color: #aaa;">
-                © ${new Date().getFullYear()} Your Company. Todos os direitos reservados.
+                © ${currentYear} Your Company. Todos os direitos reservados.
               </td>
             </tr>
           </table>
@@ -44,7 +47,7 @@ export async function sendPasswordRecoveryEmail(
       </html>
     `)
     .setText(
-      `Olá ${recipientName},\n\nAqui está sua senha temporária: ${temporaryPassword}\n\nRecomendamos que você altere sua senha assim que fizer login.\n\nVisite https://yourdomain.com/reset-password para redefinir sua senha.`
+      `Olá ${recipientName},\n\nAqui está sua senha temporária: ${temporaryPassword}\n\nRecomendamos que você altere sua senha assim que fizer login.\n\nVisite https://artlaser.vercel.app/signIn para redefinir sua senha.`
     )
 
   try {
@@ -52,5 +55,6 @@ export async function sendPasswordRecoveryEmail(
     console.log('Email de recuperação de senha enviado com sucesso!')
   } catch (error) {
     console.error('Erro ao enviar email de recuperação de senha:', error)
+    throw new Error('Erro ao enviar email de recuperação de senha.')
   }
 }

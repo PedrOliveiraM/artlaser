@@ -75,7 +75,7 @@ export default function SettingsForm(defaultValues: IDefaultValues) {
           variant: 'success',
         })
         signOut({
-          redirectTo: '/signin',
+          redirectTo: '/signIn',
         })
       } else {
         toast({

@@ -7,16 +7,16 @@ import { NextResponse } from 'next/server'
 import { ZodError } from 'zod'
 
 interface IUser {
-  username: string;
-  email: string;
-  password: string;
+  username: string
+  email: string
+  password: string
 }
 
 export async function POST(request: Request) {
   try {
-    const body:IUser = await request.json()
+    const body: IUser = await request.json()
 
-    const {username, email, password } = userSchema.parse(body)
+    const { username, email, password } = userSchema.parse(body)
 
     if (!email || !password) {
       return NextResponse.json<ApiResponse<User>>({
@@ -34,7 +34,7 @@ export async function POST(request: Request) {
 
     const newUser = await db.user.create({
       data: {
-        username,
+        username: username || '',
         email,
         password: hashedPassword,
       },
