@@ -8,7 +8,7 @@ const mailerSend = new MailerSend({
   apiKey: process.env.MAILERSEND_API_TOKEN as string,
 })
 
-const sentFrom = new Sender('MS_8kGkZ4@trial-0p7kx4xy8jml9yjr.mlsender.net', 'Artlaser')
+const sentFrom = new Sender(process.env.MAILERSEND_EMAIL || '', 'Artlaser')
 const currentYear = new Date().getFullYear()
 
 export async function sendPasswordRecoveryEmail(

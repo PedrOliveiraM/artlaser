@@ -26,6 +26,21 @@ export async function POST(request: Request) {
       })
     }
 
+    // Verifique se o email já existe
+    const existingUser = await db.user.findUnique({
+      where: {
+        email: email,
+      },
+    })
+
+    if (existingUser) {
+      return NextResponse.json<ApiResponse<User>>({
+        status: 409, // Conflito de dados
+        data: undefined,
+        message: 'O email já está em uso.',
+      })
+    }
+
     const hashedPassword = await hashPassword(password)
 
     if (!hashedPassword) {
@@ -40,13 +55,14 @@ export async function POST(request: Request) {
       },
     })
 
-    // Retorna sucesso
     return NextResponse.json<ApiResponse<User>>({
       status: 200,
       data: newUser,
       message: 'Usuário cadastrado com sucesso',
     })
   } catch (error) {
+    console.error(error) // Log do erro completo
+
     if (error instanceof ZodError) {
       const errosMessage: string[] = error.errors.map(
         err => `${err.path.join('.')} - ${err.message}`
@@ -59,7 +75,7 @@ export async function POST(request: Request) {
           message: 'Erro de validação nos campos',
           errors: errosMessage,
         },
-        { status: 400 } // Define explicitamente o status HTTP
+        { status: 400 }
       )
     }
 
@@ -69,7 +85,7 @@ export async function POST(request: Request) {
         data: undefined,
         message: 'Erro desconhecido',
       },
-      { status: 500 } // Define explicitamente o status HTTP
+      { status: 500 }
     )
   }
 }

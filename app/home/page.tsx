@@ -32,21 +32,27 @@ export default function Home() {
     fetchProducts()
   }, [])
 
-  const serializedProducts = products.map(product => ({
-    ...product,
-    retailPrice: parseFloat(product.retailPrice.toString()),
-    wholesalePrice: parseFloat(product.wholesalePrice.toString()),
-  }))
-
-  if (isLoaded) return <SkeletonHomePage />
+  const serializedProducts = products
+    .filter(product => product.status === true)
+    .map(product => ({
+      ...product,
+      retailPrice: parseFloat(product.retailPrice.toString()),
+      wholesalePrice: parseFloat(product.wholesalePrice.toString()),
+    }))
 
   return (
-    <main className="min-h-screen">
-      <BannersCarousel />
-      <div className="container mx-auto px-4 md:py-4">
-        <ProductGrid products={serializedProducts} />
-        <WhatsappButton />
-      </div>
-    </main>
+    <>
+      {isLoaded ? (
+        <SkeletonHomePage />
+      ) : (
+        <main className="min-h-screen">
+          <BannersCarousel />
+          <div className="container mx-auto px-4 md:py-4">
+            <ProductGrid products={serializedProducts} />
+            <WhatsappButton />
+          </div>
+        </main>
+      )}
+    </>
   )
 }
